@@ -1,0 +1,84 @@
+[
+  {
+    "id": "demo-001",
+    "name": "[TCU] Smiths Cogwheels Inc",
+    "company_name": "Smiths Cogwheels, Inc.",
+    "industry": "Automotive Manufacturing",
+    "stage": "Technical Validation",
+    "deal_value": 385000,
+    "close_date": "2026-10-30",
+    "competitor": "CrowdStrike",
+    "products_scoped": ["Taegis XDR", "Taegis MDR"],
+    "taegis_tenant_id": null,
+    "account_executive": "Sarah Chen",
+    "technical_win_criteria": "Unified XDR visibility across 6 heterogeneous EDR tools in 4 countries; sub-30min MTTR; cloud coverage for Azure workloads; OT/IT convergence at manufacturing plants; demonstrate attribution capability the previous SIEM lacked.",
+
+    "company_profile": {
+      "legal_name": "Smiths Cogwheels, Inc.",
+      "ticker": null,
+      "founded": 1997,
+      "founder": "Winston Smiths",
+      "headquarters": "Chicago, Illinois, USA",
+      "revenue_usd": 1000000000,
+      "employees": 2000,
+      "countries": 4,
+      "plants": 2,
+      "offices": 4,
+      "website": "smithscogwheels.com",
+      "customers": ["General Motors", "Ford Motor Company", "Volkswagen", "Toyota", "Tesla", "Tata Motors"],
+      "cloud": "Microsoft Azure (R&D and Office workloads migrated)"
+    },
+
+    "edr_landscape": [
+      { "location": "Chicago, IL (US) — HQ Office", "edr": "CrowdStrike Falcon", "contacts": ["Kim Vilmos", "Burt Ward", "Brandon Perry", "Justin Jones", "Amanda Walters"] },
+      { "location": "Frankfurt (DE) — Plant",        "edr": "Sophos XDR",         "contacts": ["Alexander Dietrich"] },
+      { "location": "Mexico City (MX) — Plant",      "edr": "Taegis Agent",       "contacts": ["Simon Hubert", "James Garcia", "Frank Harrison", "Nate Bale"] },
+      { "location": "Eindhoven (NL) — Office",       "edr": "SentinelOne",        "contacts": ["Tom Wall", "Valorie Hopkins", "Dorothy Beckson"] },
+      { "location": "Toyota, Aichi (JP) — Office",   "edr": "VMware Carbon Black", "contacts": [] },
+      { "location": "London (UK) — Office",          "edr": "Microsoft Defender for Endpoint", "contacts": ["Ian Johnson", "Lesly McDaniel", "Sam Rice", "Sophie Adams", "Chris Mullins"] },
+      { "location": "Guanajuato (MX) — Resources",  "edr": "Taegis Agent",       "contacts": ["Francisco Esquivel", "Amila Ferdo"] }
+    ],
+
+    "se_notes": [
+      {
+        "date": "2026-01-10",
+        "author": "SE",
+        "note": "CRITICAL CONTEXT — Previous breach (approx. 18 months ago): root cause was never identified. The incident resulted in loss of BMW as a customer (supply chain attack) and got the previous CISO fired. The new CISO (onboard 4 months) has a direct mandate from the board to prevent recurrence. Budget has been approved; this is a must-win for them politically."
+      },
+      {
+        "date": "2026-01-22",
+        "author": "SE",
+        "note": "EDR fragmentation is the core pain. SCI runs 6 different EDR tools across 4 countries — CrowdStrike in Chicago HQ, Sophos XDR in Frankfurt, Taegis Agent in Mexico City and Guanajuato, SentinelOne in Eindhoven, Carbon Black in Japan, and Microsoft Defender in London. There is NO unified view. A SOC analyst investigating a multi-country incident has to pivot across 6 consoles. This is exactly what made attribution impossible in the previous breach."
+      },
+      {
+        "date": "2026-02-05",
+        "author": "SE",
+        "note": "Cloud migration risk: SCI moved R&D and office workloads to Azure without adequate security due diligence (pressure to cut IT costs post-COVID). No CSPM. Azure AD identity telemetry is not correlated with endpoint activity. CISO admitted they have zero visibility into what's happening in the cloud."
+      },
+      {
+        "date": "2026-02-18",
+        "author": "SE",
+        "note": "Manufacturing plants (Frankfurt DE, Mexico City MX) run OT/IT converged networks. Line controllers and SCADA systems are on the same network segments as Windows workstations. Neither plant has OT-specific monitoring. Sophos XDR is deployed on IT endpoints in Frankfurt but nothing covers OT. Key objection from plant manager: 'We cannot afford unplanned downtime for a security deployment.'"
+      },
+      {
+        "date": "2026-02-25",
+        "author": "SE",
+        "note": "Technical deep-dive went well. Showed Taegis XDR ingesting CrowdStrike, SentinelOne, MDE, and Carbon Black telemetry simultaneously via native integrations — no agent replacement needed. CISO visibly excited. Primary objection from IT Ops lead: migration risk and TCO versus 'just expanding CrowdStrike globally.' Need to quantify what a single-EDR bet costs vs. XDR normalisation."
+      },
+      {
+        "date": "2026-03-01",
+        "author": "SE",
+        "note": "Supply chain risk follow-up: SCI supplies GM, Ford, VW, Toyota, Tesla, and Tata. All require supplier security attestations. After the breach and losing BMW, the CISO is under pressure to demonstrate improved security posture to remaining OEMs. A board-ready dashboard showing cross-country threat coverage and MTTR would directly address this compliance need."
+      }
+    ],
+
+    "business_challenges": [
+      "Previous breach with unidentified root cause → CISO fired, BMW lost as customer",
+      "6 heterogeneous EDR tools across 4 countries — no unified visibility or correlation",
+      "Azure cloud migration without security controls (no CSPM, no identity correlation)",
+      "OT/IT convergence at Frankfurt and Mexico City plants — SCADA on shared network",
+      "Supply chain security attestation pressure from remaining OEM customers (GM, Ford, VW, Toyota, Tesla)",
+      "M&A-driven EMEA expansion adding more disconnected IT environments"
+    ]
+  }
+]

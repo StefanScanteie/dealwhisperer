@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taegis Deal Whisperer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sophos-blue:     #005BC8;
+      --sophos-blue-dark: #004799;
+      --sophos-blue-light: #E8F1FC;
+      --white:          #FFFFFF;
+      --gray-50:        #F8FAFC;
+      --gray-100:       #F1F5F9;
+      --gray-200:       #E2E8F0;
+      --gray-300:       #CBD5E1;
+      --gray-500:       #64748B;
+      --gray-700:       #334155;
+      --gray-900:       #0F172A;
+      --success:       #059669;
+      --success-bg:     #ECFDF5;
+      --warning:        #D97706;
+      --warning-bg:     #FFFBEB;
+      --error:          #DC2626;
+      --radius:         8px;
+      --radius-lg:      12px;
+      --shadow:         0 1px 3px rgba(0, 91, 200, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      box-shadow: var(--shadow);
+    }
+    .header-left { display: flex; align-items: center; gap: 20px; }
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .taegis-logo {
+      height: 30px;
+      width: auto;
+    }
+    .logo-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+    .logo-text span { color: var(--sophos-blue); }
+    .api-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: var(--gray-100);
+      color: var(--gray-500);
+    }
+    .pill.on {
+      background: var(--sophos-blue-light);
+      color: var(--sophos-blue);
+      border: 1px solid rgba(0, 91, 200, 0.2);
+    }
+    .main {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+    .left {
+      width: 400px;
+      min-width: 400px;
+      background: var(--white);
+      border-right: 1px solid var(--gray-200);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .left-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-500);
+      margin-bottom: -8px;
+    }
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--gray-100);
+      padding: 4px;
+      border-radius: var(--radius);
+    }
+    .tab {
+      flex: 1;
+      padding: 10px 16px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--gray-600);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .tab:hover { color: var(--gray-700); }
+    .tab.active {
+      background: var(--white);
+      color: var(--sophos-blue);
+      box-shadow: var(--shadow);
+    }
+    .panel { display: none; }
+    .panel.active { display: flex; flex-direction: column; gap: 16px; }
+    input, textarea {
+      font-family: inherit;
+      font-size: 0.9375rem;
+      padding: 12px 16px;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      background: var(--white);
+      color: var(--gray-900);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input::placeholder, textarea::placeholder { color: var(--gray-500); }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--sophos-blue);
+      box-shadow: 0 0 0 3px var(--sophos-blue-light);
+    }
+    textarea { min-height: 88px; resize: vertical; }
+    .btn-generate {
+      background: var(--sophos-blue);
+      color: var(--white);
+      border: none;
+      padding: 14px 24px;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-generate:hover { background: var(--sophos-blue-dark); }
+    .btn-generate:disabled { opacity: 0.6; cursor: not-allowed; }
+    .status-bar {
+      display: none;
+      min-height: 28px;
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      padding: 6px 0;
+    }
+    .status-bar.visible { display: flex; align-items: center; gap: 8px; }
+    .status-bar.loading { color: var(--sophos-blue); }
+    .status-bar.loading::before {
+      content: '';
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--gray-200);
+      border-top-color: var(--sophos-blue);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    .status-bar.error { color: var(--error); }
+    .status-bar.success { color: var(--success); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .quick-actions {
+      display: none;
+      padding-top: 8px;
+      border-top: 1px solid var(--gray-200);
+    }
+    .quick-actions.visible { display: block; }
+    .quick-actions button {
+      padding: 10px 14px;
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      color: var(--gray-700);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .quick-actions button:hover {
+      border-color: var(--sophos-blue);
+      background: var(--sophos-blue-light);
+      color: var(--sophos-blue);
+    }
+    @media print {
+      .header, .left { display: none !important; }
+      .main { display: block !important; }
+      .right { padding: 16px !important; overflow: visible !important; }
+      .empty-state { display: none !important; }
+      .brief-card { display: block !important; max-width: 100% !important; }
+      .no-access-banner { display: none !important; }
+    }
+    .right {
+      flex: 1;
+      overflow: auto;
+      padding: 32px 40px;
+    }
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 420px;
+      text-align: center;
+      padding: 48px;
+    }
+    .empty-state p {
+      font-size: 1.125rem;
+      color: var(--gray-500);
+      margin: 0;
+      max-width: 360px;
+      line-height: 1.6;
+    }
+    .brief-card { display: none; max-width: 780px; }
+    .brief-card.visible { display: block; }
+    .brief-header {
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--gray-200);
+    }
+    .brief-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin: 0 0 12px 0;
+      letter-spacing: -0.02em;
+    }
+    .badges { display: flex; gap: 10px; flex-wrap: wrap; }
+    .badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+    .badge.mode-prospect {
+      background: var(--sophos-blue-light);
+      color: var(--sophos-blue);
+    }
+    .badge.mode-customer {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+    .badge.mood {
+      background: var(--gray-100);
+      color: var(--gray-700);
+    }
+    .roi-hook {
+      background: var(--warning-bg);
+      border-left: 4px solid var(--warning);
+      padding: 18px 22px;
+      margin: 24px 0;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--gray-900);
+      line-height: 1.55;
+    }
+    .section {
+      margin: 28px 0;
+      padding: 24px;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow);
+    }
+    .section-title {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--sophos-blue);
+      margin-bottom: 14px;
+    }
+    .section-body {
+      font-size: 0.9375rem;
+      color: var(--gray-700);
+      line-height: 1.65;
+    }
+    .objection-card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+    .objection-card:last-child { margin-bottom: 0; }
+    .objection-card .q {
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+      font-size: 0.9375rem;
+    }
+    .objection-card .a {
+      color: var(--gray-600);
+      font-size: 0.9375rem;
+      line-height: 1.55;
+      padding-left: 4px;
+    }
+    .demo-flow-item {
+      margin-bottom: 16px;
+      padding: 14px 18px;
+      background: var(--gray-50);
+      border-radius: var(--radius);
+      border-left: 3px solid var(--sophos-blue);
+    }
+    .demo-flow-item:last-child { margin-bottom: 0; }
+    .demo-flow-item .screen {
+      font-weight: 600;
+      color: var(--sophos-blue);
+      font-size: 0.9375rem;
+    }
+    .demo-flow-item .duration { font-size: 0.8125rem; color: var(--gray-500); margin-left: 6px; }
+    .demo-flow-item .talking { color: var(--gray-700); margin-top: 6px; font-size: 0.9375rem; }
+    .osint-section {
+      background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+      border: 1px solid #DDD6FE;
+    }
+    .osint-section .section-title { color: #6D28D9; }
+    .qbr-stats { list-style: none; padding: 0; margin: 0; }
+    .qbr-stats li {
+      margin: 10px 0;
+      padding-left: 28px;
+      position: relative;
+      font-size: 0.9375rem;
+      color: var(--gray-700);
+      line-height: 1.5;
+    }
+    .qbr-stats li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--success);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .expansion-block p { margin: 0 0 10px 0; font-size: 0.9375rem; color: var(--gray-700); }
+    .expansion-block p:last-child { margin-bottom: 0; }
+    .expansion-block strong { color: var(--gray-900); }
+    .no-access-banner {
+      font-size: 0.8125rem;
+      color: var(--gray-500);
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      margin-top: 12px;
+    }
+    .no-access-banner strong { color: var(--gray-700); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-wrap">
+        <img src="https://docs.taegis.secureworks.com/img/taegis.svg" alt="Taegis" class="taegis-logo">
+        <span class="logo-text">Deal <span>Whisperer</span></span>
+      </div>
+    </div>
+    <div class="api-pills" id="apiPills">
+      <span class="pill" data-api="anthropic">Claude</span>
+      <span class="pill" data-api="vivun">Vivun</span>
+      <span class="pill" data-api="taegis">Taegis</span>
+      <span class="pill" data-api="serper">OSINT</span>
+    </div>
+  </header>
+  <div class="main">
+    <aside class="left">
+      <span class="left-label">Generate brief</span>
+      <div class="tabs">
+        <button type="button" class="tab active" data-tab="vivun">Vivun opportunity</button>
+        <button type="button" class="tab" data-tab="manual">Manual input</button>
+      </div>
+      <div id="panelVivun" class="panel active">
+        <input type="text" id="oppName" placeholder="e.g. Smiths Cogwheels" />
+        <button type="button" class="btn-generate" id="btnGenerate">Generate brief</button>
+      </div>
+      <div id="panelManual" class="panel">
+        <input type="text" id="manualCompany" placeholder="Company name" />
+        <input type="text" id="manualIndustry" placeholder="Industry" />
+        <input type="text" id="manualStage" placeholder="Stage" />
+        <input type="text" id="manualCompetitor" placeholder="Competitor" />
+        <input type="text" id="manualPain" placeholder="Pain / win criteria" />
+        <textarea id="manualNotes" placeholder="Notes"></textarea>
+        <button type="button" class="btn-generate" id="btnManualGenerate">Generate brief</button>
+      </div>
+      <div class="status-bar" id="statusBar"></div>
+      <div class="quick-actions" id="quickActions">
+        <button type="button" id="btnExportPDF" title="Opens print dialog; choose 'Save as PDF' to export.">Export PDF</button>
+      </div>
+    </aside>
+    <section class="right">
+      <div class="empty-state" id="emptyState">
+        <img src="/static/empty-state-icon.png" alt="" style="width:94px; height:auto; margin-bottom:24px;">
+        <p>Enter an opportunity name to generate a personalized pre-call battle card.</p>
+      </div>
+      <div class="brief-card" id="briefCard">
+        <div class="brief-header">
+          <h1 id="briefCompany">—</h1>
+          <div class="badges" id="briefBadges"></div>
+          <div class="no-access-banner" id="noAccessBanner" style="display: none;"></div>
+        </div>
+        <div class="roi-hook" id="briefRoiHook"></div>
+        <div class="section" id="sectionSnapshot">
+          <div class="section-title">Deal snapshot</div>
+          <div class="section-body" id="briefSnapshot"></div>
+        </div>
+        <div class="section" id="sectionObjections">
+          <div class="section-title">Objections & rebuttals</div>
+          <div id="briefObjections"></div>
+        </div>
+        <div class="section" id="sectionDemoFlow">
+          <div class="section-title">Demo flow</div>
+          <div id="briefDemoFlow"></div>
+        </div>
+        <div class="section osint-section" id="sectionOsint">
+          <div class="section-title">OSINT & conversation hook</div>
+          <div class="section-body" id="briefOsint"></div>
+        </div>
+        <div class="section" id="sectionActionItems">
+          <div class="section-title">Open action items</div>
+          <div class="section-body" id="briefActionItems"></div>
+        </div>
+        <div class="section" id="sectionExpansion">
+          <div class="section-title">Expansion opportunity</div>
+          <div class="section-body expansion-block" id="briefExpansion"></div>
+        </div>
+        <div class="section" id="sectionQbr">
+          <div class="section-title">QBR headline stats</div>
+          <ul class="qbr-stats" id="briefQbr"></ul>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+    function esc(str) {
+      if (str == null || str === undefined) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function checkHealth() {
+      fetch('/health')
+        .then(r => r.json())
+        .then(data => {
+          const apis = data.apis || {};
+          document.querySelectorAll('.pill[data-api]').forEach(pill => {
+            const key = pill.getAttribute('data-api');
+            if (apis[key]) pill.classList.add('on');
+            else pill.classList.remove('on');
+          });
+        })
+        .catch(() => {});
+    }
+
+    function setStatus(msg, type) {
+      const bar = document.getElementById('statusBar');
+      bar.textContent = msg;
+      bar.classList.add('visible');
+      bar.classList.remove('loading', 'error', 'success');
+      if (type) bar.classList.add(type);
+    }
+
+    function renderBrief(brief) {
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('briefCard').classList.add('visible');
+      document.getElementById('quickActions').classList.add('visible');
+
+      const company = brief.company || '—';
+      document.getElementById('briefCompany').textContent = company;
+
+      const mode = brief.mode || 'prospect';
+      const mood = brief.deal_mood || '';
+      let badgesHtml = '<span class="badge mode-' + esc(mode) + '">' + (mode === 'customer' ? 'Customer' : 'Prospect') + '</span>';
+      if (mood) badgesHtml += '<span class="badge mood">' + esc(mood) + '</span>';
+      document.getElementById('briefBadges').innerHTML = badgesHtml;
+
+      var noAccess = brief.no_access_sources || [];
+      var bannerEl = document.getElementById('noAccessBanner');
+      if (noAccess.length) {
+        bannerEl.style.display = 'block';
+        bannerEl.innerHTML = '<strong>No access:</strong> ' + noAccess.join(', ');
+      } else {
+        bannerEl.style.display = 'none';
+        bannerEl.innerHTML = '';
+      }
+
+      document.getElementById('briefRoiHook').textContent = brief.roi_hook || '';
+
+      document.getElementById('briefSnapshot').textContent = brief.deal_snapshot || '';
+
+      const objections = brief.objections || [];
+      document.getElementById('sectionObjections').style.display = objections.length ? 'block' : 'none';
+      document.getElementById('briefObjections').innerHTML = objections.map(o =>
+        '<div class="objection-card"><div class="q">' + esc(o.objection) + '</div><div class="a">' + esc(o.rebuttal) + '</div></div>'
+      ).join('');
+
+      const demoFlow = brief.demo_flow || [];
+      document.getElementById('sectionDemoFlow').style.display = demoFlow.length ? 'block' : 'none';
+      document.getElementById('briefDemoFlow').innerHTML = demoFlow.map((d, i) =>
+        '<div class="demo-flow-item"><span class="screen">' + (i + 1) + '. ' + esc(d.screen) + '</span><span class="duration">(' + (d.duration_mins || 0) + ' min)</span><div class="talking">' + esc(d.talking_point) + '</div></div>'
+      ).join('');
+
+      const isProspect = mode === 'prospect';
+      document.getElementById('sectionOsint').style.display = isProspect && (brief.osint_insight || brief.conversation_hook) ? 'block' : 'none';
+      let osintHtml = '';
+      if (brief.osint_insight) osintHtml += '<p style="margin:0 0 12px 0"><strong>OSINT insight:</strong> ' + esc(brief.osint_insight) + '</p>';
+      if (brief.conversation_hook) osintHtml += '<p style="margin:0"><strong>Conversation hook:</strong> ' + esc(brief.conversation_hook) + '</p>';
+      document.getElementById('briefOsint').innerHTML = osintHtml || '—';
+
+      const actionItems = brief.open_action_items || [];
+      document.getElementById('sectionActionItems').style.display = actionItems.length ? 'block' : 'none';
+      document.getElementById('briefActionItems').innerHTML = actionItems.length
+        ? '<ul style="margin:0; padding-left:20px">' + actionItems.map(a => '<li style="margin:6px 0">' + esc(a) + '</li>').join('') + '</ul>'
+        : '';
+
+      const expansion = brief.expansion_opportunity;
+      document.getElementById('sectionExpansion').style.display = expansion && mode === 'customer' ? 'block' : 'none';
+      if (expansion && typeof expansion === 'object') {
+        document.getElementById('briefExpansion').innerHTML =
+          '<p><strong>Surface:</strong> ' + esc(expansion.surface) + '</p>' +
+          '<p><strong>Risk:</strong> ' + esc(expansion.risk) + '</p>' +
+          '<p><strong>Product:</strong> ' + esc(expansion.product) + '</p>';
+      } else {
+        document.getElementById('briefExpansion').textContent = expansion || '—';
+      }
+
+      const qbrStats = brief.qbr_headline_stats || [];
+      document.getElementById('sectionQbr').style.display = qbrStats.length && mode === 'customer' ? 'block' : 'none';
+      document.getElementById('briefQbr').innerHTML = qbrStats.map(s => '<li>' + esc(s) + '</li>').join('');
+    }
+
+    function generate() {
+      const oppName = document.getElementById('oppName').value.trim();
+      if (!oppName) { setStatus('Enter an opportunity name.', 'error'); return; }
+      setStatus('Generating…', 'loading');
+      document.getElementById('btnGenerate').disabled = true;
+      fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ opp_name: oppName })
+      })
+        .then(r => {
+          if (!r.ok) return r.json().then(j => { throw new Error(j.error || r.statusText); });
+          return r.json();
+        })
+        .then(brief => { renderBrief(brief); setStatus('Brief ready.', 'success'); })
+        .catch(err => { setStatus('Error: ' + err.message, 'error'); })
+        .finally(() => { document.getElementById('btnGenerate').disabled = false; });
+    }
+
+    function generateManual() {
+      const company = document.getElementById('manualCompany').value.trim();
+      if (!company) { setStatus('Enter company name.', 'error'); return; }
+      setStatus('Generating…', 'loading');
+      document.getElementById('btnManualGenerate').disabled = true;
+      fetch('/quick-brief', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company,
+          industry: document.getElementById('manualIndustry').value.trim(),
+          stage: document.getElementById('manualStage').value.trim(),
+          competitor: document.getElementById('manualCompetitor').value.trim(),
+          pain: document.getElementById('manualPain').value.trim(),
+          notes: document.getElementById('manualNotes').value.trim()
+        })
+      })
+        .then(r => {
+          if (!r.ok) return r.json().then(j => { throw new Error(j.error || r.statusText); });
+          return r.json();
+        })
+        .then(brief => { renderBrief(brief); setStatus('Brief ready.', 'success'); })
+        .catch(err => { setStatus('Error: ' + err.message, 'error'); })
+        .finally(() => { document.getElementById('btnManualGenerate').disabled = false; });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      checkHealth();
+      document.querySelectorAll('.tab').forEach(t => {
+        t.addEventListener('click', function() {
+          document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+          document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+          this.classList.add('active');
+          const tab = this.getAttribute('data-tab');
+          document.getElementById('panel' + (tab === 'vivun' ? 'Vivun' : 'Manual')).classList.add('active');
+        });
+      });
+      document.getElementById('oppName').addEventListener('keydown', function(e) { if (e.key === 'Enter') generate(); });
+      document.getElementById('btnGenerate').addEventListener('click', generate);
+      document.getElementById('btnManualGenerate').addEventListener('click', generateManual);
+      document.getElementById('btnExportPDF').addEventListener('click', function() {
+        window.print();
+      });
+    });
+  </script>
+</body>
+</html>
