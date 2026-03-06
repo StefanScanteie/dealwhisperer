@@ -50,19 +50,19 @@ Mode is **auto-detected**: if the opportunity has a `taegis_tenant_id`, the app 
 ```
 ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
 │   Vivun     │   │   Taegis    │   │   Serper    │
-│ (opportunity)│   │ (threat     │   │ (OSINT)     │
-│             │   │  intel)     │   │             │
+│   (opp)     │   │ (threat     │   │   (OSINT)   │
+│             │   │      intel) │   │             │
 └──────┬──────┘   └──────┬──────┘   └──────┬──────┘
        │                 │                 │
        └─────────────────┴────────┬────────┘
                                   ▼
                          ┌─────────────────┐
-                         │  Claude AI      │
+                         │   Claude AI     │
                          │  (synthesis)    │
                          └────────┬────────┘
                                   ▼
                          ┌─────────────────┐
-                         │  Browser UI     │
+                         │   Browser UI    │
                          │  (Export PDF)   │
                          └─────────────────┘
 ```
@@ -109,6 +109,13 @@ DealWisperer/
 | Serper | Free tier (2,500 searches) | $0 |
 | Vivun / Taegis | Existing org credentials | $0 |
 
-## License
+## ⚖️ License
 
-Internal tool — not for redistribution.
+**Sophos** and the **Sophos logo** are registered trademarks of Sophos Ltd.
+
+---
+
+<p align="center">
+  Built with ❤️ by Ștefan, with guidance from Claude and Cursor.
+</p>
+
