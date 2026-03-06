@@ -7,7 +7,12 @@ AI-powered pre-call battle card generator for Sales Engineers. Combines opportun
 1. **Pulls opportunity data** from Vivun (company profile, deal stage, competitor, SE notes, EDR landscape, technical win criteria). Falls back to local sample data (`data/sample_opportunities.json`) when `VIVUN_API_KEY` is not set.
 2. **Fetches Taegis threat intelligence** — industry-level CTU publications for prospects (including CTPX-specific `threatLatestPublications`); customer telemetry and coverage gaps for existing Taegis customers. Uses the same [Taegis XDR API credentials](https://docs.taegis.secureworks.com/magic/magic_overview/) as Taegis Magic.
 3. **Runs OSINT** (prospects only) via Serper — job postings and news to infer security tools in use, hiring signals, and conversation starters.
-4. **Synthesizes a battle card** with Claude — deal snapshot, ROI hook, competitive angle, objections & rebuttals, demo flow, conversation hook, action items (or QBR stats for customers).
+4. **Synthesizes a battle card** with Claude, driven by a comprehensive SE knowledge base that includes:
+   - **Taegis platform knowledge** — XDR (open platform, 400+ integrations, CTU intel), MDR (24/7 SOC, 1-hour MTTC SLA), and the Secureworks-to-Sophos acquisition narrative.
+   - **Competitive intelligence** — win angles and objection rebuttals for CrowdStrike, SentinelOne, Microsoft Defender/Sentinel, Palo Alto Cortex/XSIAM, and Splunk SIEM.
+   - **Industry threat context** — sector-specific attack patterns, compliance requirements, and proof points for Healthcare, Financial Services, Manufacturing/OT, and Technology.
+   - **ROI framework** — breach cost avoidance, headcount replacement math, and anonymized Taegis MDR benchmarks (MTTD, MTTR, containment rates).
+   - **SE behavioral rules** — deal-stage matching, competitor-specific rebuttals, OSINT hook prioritization, customer-mode telemetry requirements, and expansion priority ordering.
 5. **Displays the brief in the browser** with a single-click **Export PDF** (browser print dialog → "Save as PDF", no plugins needed).
 
 ## Quick start
@@ -42,8 +47,24 @@ When an API cannot be reached (missing credentials or request failure), that ste
 |--|--------------|--------------|
 | **Data sources** | Vivun + Taegis industry intel + OSINT | Vivun + Taegis customer telemetry |
 | **Brief sections** | Competitive angle, ROI hook, demo flow, conversation hook, objections | QBR stats, coverage gaps, renewal defense, expansion opportunity |
+| **AI behavior** | Deal-stage-aware competitive positioning, OSINT-driven conversation hooks, numbered ROI claims | Real telemetry stats (not benchmarks), expansion priority ordering by risk, renewal defense narrative |
 
 Mode is **auto-detected**: if the opportunity has a `taegis_tenant_id`, the app uses **customer** mode; otherwise **prospect**.
+
+## AI knowledge base
+
+The synthesizer is powered by a comprehensive system prompt (`agents/system_prompt.txt`) that encodes domain expertise across six areas:
+
+| Area | What it covers |
+|------|----------------|
+| **Taegis platform** | XDR architecture, MDR SLAs, CTU intel heritage, Sophos integration points |
+| **Secureworks → Sophos** | Acquisition messaging, continuity for existing customers, combined portfolio value |
+| **Competitive intel** | CrowdStrike, SentinelOne, Microsoft, Palo Alto, Splunk — specific win angles and objection rebuttals |
+| **Industry threats** | Healthcare, Financial Services, Manufacturing/OT, Technology — attack patterns, compliance, proof points |
+| **ROI framework** | Breach cost avoidance ($4.88M avg), headcount replacement (2-4 FTE), Taegis MTTD/MTTR benchmarks |
+| **SE behavioral rules** | 7 rules: deal-stage matching, use numbers, reference named competitor, OSINT hooks, customer-mode telemetry, expansion priorities, migration angle |
+
+The prompt is stored as a plain-text file so it can be reviewed, versioned, and updated independently of the Python code.
 
 ## Architecture
 
@@ -56,15 +77,16 @@ Mode is **auto-detected**: if the opportunity has a `taegis_tenant_id`, the app 
        │                 │                 │
        └─────────────────┴────────┬────────┘
                                   ▼
-                         ┌─────────────────┐
-                         │   Claude AI     │
-                         │  (synthesis)    │
-                         └────────┬────────┘
-                                  ▼
-                         ┌─────────────────┐
-                         │   Browser UI    │
-                         │  (Export PDF)   │
-                         └─────────────────┘
+                     ┌────────────────────┐
+                     │     Claude AI      │
+                     │  + SE knowledge    │
+                     │    base prompt     │
+                     └─────────┬──────────┘
+                               ▼
+                     ┌────────────────────┐
+                     │    Browser UI      │
+                     │   (Export PDF)     │
+                     └────────────────────┘
 ```
 
 ## Project structure
@@ -77,7 +99,8 @@ DealWisperer/
 │   ├── vivun_agent.py      # Vivun API + sample data fallback
 │   ├── taegis_agent.py     # Taegis GraphQL (standard + CTPX)
 │   ├── osint_agent.py      # Serper OSINT (jobs + news)
-│   └── synthesizer.py      # Claude AI brief generation + normalization
+│   ├── synthesizer.py      # Claude AI brief generation + normalization
+│   └── system_prompt.txt   # SE knowledge base (platform, competitive, industry, ROI, rules)
 ├── templates/
 │   └── index.html          # Single-page UI
 ├── static/
@@ -109,13 +132,12 @@ DealWisperer/
 | Serper | Free tier (2,500 searches) | $0 |
 | Vivun / Taegis | Existing org credentials | $0 |
 
-## ⚖️ License
+## License
 
 **Sophos** and the **Sophos logo** are registered trademarks of Sophos Ltd.
 
 ---
 
 <p align="center">
-  Built with ❤️ by Ștefan, with guidance from Claude and Cursor.
+  Built with care by Stefan, with guidance from Claude and Cursor.
 </p>
-
