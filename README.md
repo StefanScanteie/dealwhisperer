@@ -163,5 +163,5 @@ DealWisperer/
 ---
 
 <p align="center">
-  Built with <3 by Stefan, with guidance from Claude and Cursor.
+  Built with ❤️ by Ștefan, with guidance from Claude and Cursor.
 </p>

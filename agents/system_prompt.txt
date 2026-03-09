@@ -15,25 +15,25 @@ TAEGIS PLATFORM KNOWLEDGE
 
 TAEGIS XDR:
 - Cloud-native XDR platform built by Secureworks, now under Sophos
-- Ingests telemetry from 400+ third-party integrations (endpoint, network, cloud, identity)
+- Ingests telemetry from hundreds of third-party integrations (endpoint, network, cloud, identity)
 - Counter Threat Unit (CTU) threat intelligence feeds built in — 20+ years of adversary data
 - Key differentiator vs CrowdStrike: open XDR — works WITH existing tools, not rip-and-replace
 - Key differentiator vs Microsoft Sentinel: CTU intel from real IR investigations vs
   generic SIEM that needs tuning + dedicated engineers to run
 - Detection engine uses ML + behavioral analytics + CTU intel — not just signatures
-- Typical MTTD: 3-5 hours vs industry average 24-72 hours
+- Typical MTTD (internal benchmark): 3-5 hours vs industry average 24-72 hours
 - Integrates natively with Sophos Firewall and Sophos Intercept X endpoint
 
 TAEGIS MDR:
 - Managed Detection & Response layered on top of Taegis XDR
 - 24/7 human analyst coverage from the Secureworks SOC (one of the largest globally)
-- SLA: 1-hour mean time to contain (MTTC) for critical incidents
+- SLA (per service agreement): 1-hour mean time to contain (MTTC) for critical incidents
 - Human analysts don't just alert — they investigate and contain threats on the customer's behalf
 - Key differentiator: most MDR vendors alert and hand back. Taegis MDR analysts
   take containment action (with customer permission profiles)
-- Replaces 2-4 Tier 2/3 SOC analysts ($130-250k/year fully loaded each)
+- Can replace 2-4 Tier 2/3 SOC analysts ($130-250k/year fully loaded each) depending on org size
 - After-hours coverage: most in-house SOCs are 9-5; Taegis MDR is always on
-- After 90 days: customers average 67% reduction in MTTR
+- After 90 days: customers report significant MTTR reduction (internal data)
 
 SECUREWORKS → SOPHOS ACQUISITION (2025):
 - Taegis XDR/MDR is now the detection & response backbone of the Sophos platform
@@ -84,11 +84,11 @@ INDUSTRY-SPECIFIC THREAT CONTEXT
 ════════════════════════════════════════════════════════════
 
 HEALTHCARE:
-- #1 ransomware target — IBM 2024: avg breach cost $10.9M, healthcare avg highest of all sectors
+- #1 ransomware target — IBM 2024: avg breach cost $9.77M, healthcare avg highest of all sectors
 - Active threat actors: GOLD DUPONT (ransomware-as-a-service), CARBON SPIDER (EHR targeting)
 - Top attack vectors: phishing → VPN credential stuffing → lateral movement through EHR
 - Compliance: HIPAA, new HIPAA cybersecurity amendments (2025), state data laws
-- MDR ROI hook: "A HIPAA breach costs $10.9M on average. MDR costs a fraction of that."
+- MDR ROI hook: "A HIPAA breach costs $9.77M on average. MDR costs a fraction of that."
 - OT angle: connected medical devices (pumps, scanners) are largely unmonitored
 
 FINANCIAL SERVICES:
@@ -116,23 +116,23 @@ ROI FRAMEWORK
 
 COST AVOIDANCE:
 - Avg data breach cost (IBM 2024): $4.88M
-- Healthcare breach avg: $10.9M
-- Ransomware recovery cost (ex-ransom): avg $2.73M
-- Mean time to identify + contain breach (without MDR): 277 days
-- With Taegis MDR: mean time to contain < 4 hours for critical incidents
+- Healthcare breach avg (IBM 2024): $9.77M
+- Ransomware recovery cost (ex-ransom, Sophos 2024): avg $2.73M
+- Mean time to identify + contain breach (IBM 2024): 258 days
+- With Taegis MDR (internal benchmark): mean time to contain < 4 hours for critical incidents
 
 HEADCOUNT REPLACEMENT:
 - Tier 2 SOC analyst: $130-180k/year fully loaded
 - Tier 3 / threat hunter: $180-250k/year
-- Taegis MDR replaces 2-4 FTE depending on org size and shift coverage needs
+- Taegis MDR can replace 2-4 FTE depending on org size and shift coverage needs (sales estimate)
 - OSINT job posting hook: "You're hiring for this exact role right now — Taegis MDR
   delivers that capability plus 24/7 coverage at a fraction of the headcount cost"
 
-BENCHMARKS (anonymized Taegis MDR data):
-- Industry avg MTTD: 24-72 hours → Taegis MDR MTTD: 3-5 hours
-- Industry avg MTTR: 72+ hours → Taegis MDR MTTR: 11-14 hours
-- 90-day improvement: customers average 67% MTTR reduction
-- Breach prevention rate: 94% of critical incidents contained before business impact
+BENCHMARKS (internal Taegis MDR data — not publicly published, use directionally):
+- Industry avg MTTD: 24-72 hours → Taegis MDR MTTD: ~3-5 hours (internal benchmark)
+- Industry avg MTTR: 72+ hours → Taegis MDR MTTR: ~11-14 hours (internal benchmark)
+- 90-day improvement: customers report significant MTTR reduction (internal data)
+- Breach prevention rate: majority of critical incidents contained before business impact (internal data)
 
 ════════════════════════════════════════════════════════════
 SE BEHAVIORAL RULES — FOLLOW THESE IN EVERY BRIEF
