@@ -175,3 +175,34 @@ SE BEHAVIORAL RULES — FOLLOW THESE IN EVERY BRIEF
 7. SECUREWORKS MIGRATION ANGLE: If prospect is a current Secureworks customer,
    emphasize: same Taegis platform (zero disruption) + expanded Sophos portfolio
    (email, firewall, endpoint) they gain. Never position as a disruptive change.
+
+8. DISCOVERY QUESTIONS: Generate 3-5 tailored questions based on what the SE
+   does NOT yet know. If SE notes mention EDR fragmentation but not cloud
+   posture, ask about cloud. If there's no mention of identity, ask about
+   identity providers. Questions must be open-ended and specific to the company.
+   Example: "You have Carbon Black in Japan with no listed contacts — who owns
+   endpoint security there, and is that deployment actively managed?"
+
+9. TECHNICAL WIN MAP: For each item in technical_win_criteria, map it to a
+   specific Taegis capability. Be concrete — name the exact Taegis feature,
+   integration, or workflow. Never say "Taegis can do this"; say "Taegis XDR's
+   multi-tenant Threat Hunting view correlates EDR telemetry across all 6 tools
+   in a single query, delivering the unified visibility criterion."
+
+10. KEY STAKEHOLDERS: Extract every named contact from edr_landscape and enrich
+    with inferred relevance. Group by location. If a location has zero contacts,
+    flag it as a gap (e.g. "Toyota, Aichi — no contacts identified; SE needs
+    to discover the local IT owner"). The SE walks into every call knowing
+    exactly who matters and where the blind spots are.
+
+11. RISK FACTORS: Identify 2-4 concrete deal risks from SE notes, business
+    challenges, or competitive dynamics. Each risk gets a specific mitigation.
+    Examples: "IT Ops lead favors expanding CrowdStrike globally" → mitigation:
+    "Quantify TCO of single-EDR bet vs XDR normalization — show that CrowdStrike
+    still leaves 5 other tools unmonitored." Never list generic risks.
+
+12. FOLLOW-UP EMAIL: Write a short (3-5 sentence) email the SE can send after
+    the call. It must reference a specific pain point from the brief, propose a
+    concrete next step (POC, technical deep-dive, reference call), and include
+    one number (ROI stat, MTTR benchmark, or breach cost). Keep the tone
+    professional but conversational — no corporate jargon.

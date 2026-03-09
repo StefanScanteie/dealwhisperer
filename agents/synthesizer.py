@@ -28,12 +28,14 @@ BRIEF_KEYS = [
     "roi_hook", "objections", "demo_flow", "osint_insight", "conversation_hook",
     "open_action_items", "call_objectives", "expansion_opportunity", "qbr_headline_stats",
     "competitive_angle", "industry_proof_point", "renewal_defense",
+    "discovery_questions", "technical_win_map", "key_stakeholders",
+    "risk_factors", "follow_up_email",
 ]
 
 _STRING_FIELDS = [
     "company", "deal_stage", "deal_mood", "deal_mood_reason", "deal_snapshot",
     "roi_hook", "osint_insight", "conversation_hook", "competitive_angle",
-    "industry_proof_point", "renewal_defense",
+    "industry_proof_point", "renewal_defense", "follow_up_email",
 ]
 
 _CAMEL_TO_SNAKE = {
@@ -52,6 +54,11 @@ _CAMEL_TO_SNAKE = {
     "renewalDefense": "renewal_defense",
     "callObjectives": "call_objectives",
     "dealMoodReason": "deal_mood_reason",
+    "discoveryQuestions": "discovery_questions",
+    "technicalWinMap": "technical_win_map",
+    "keyStakeholders": "key_stakeholders",
+    "riskFactors": "risk_factors",
+    "followUpEmail": "follow_up_email",
 }
 
 
@@ -123,6 +130,44 @@ def _normalize_expansion(raw: Any) -> dict:
     return {"surface": "", "risk": "", "product": ""}
 
 
+def _normalize_technical_win_map(raw: list) -> list[dict]:
+    return [
+        {
+            "criterion": t.get("criterion") or "",
+            "taegis_answer": t.get("taegis_answer") or t.get("taegisAnswer") or "",
+        }
+        for t in raw
+        if isinstance(t, dict)
+    ]
+
+
+def _normalize_key_stakeholders(raw: list) -> list[dict]:
+    return [
+        {
+            "name": s.get("name") or "",
+            "location": s.get("location") or "",
+            "role_or_relevance": (
+                s.get("role_or_relevance")
+                or s.get("roleOrRelevance")
+                or s.get("role") or ""
+            ),
+        }
+        for s in raw
+        if isinstance(s, dict)
+    ]
+
+
+def _normalize_risk_factors(raw: list) -> list[dict]:
+    return [
+        {
+            "risk": r.get("risk") or "",
+            "mitigation": r.get("mitigation") or "",
+        }
+        for r in raw
+        if isinstance(r, dict)
+    ]
+
+
 def _normalize_claude_brief(data: Dict[str, Any]) -> Dict[str, Any]:
     """Ensure Claude response has the exact keys and shapes the UI expects."""
     out: Dict[str, Any] = {}
@@ -132,7 +177,11 @@ def _normalize_claude_brief(data: Dict[str, Any]) -> Dict[str, Any]:
 
     out["objections"] = _normalize_objections(out.get("objections") or [])
     out["demo_flow"] = _normalize_demo_flow(out.get("demo_flow") or [])
+    out["technical_win_map"] = _normalize_technical_win_map(out.get("technical_win_map") or [])
+    out["key_stakeholders"] = _normalize_key_stakeholders(out.get("key_stakeholders") or [])
+    out["risk_factors"] = _normalize_risk_factors(out.get("risk_factors") or [])
     out["open_action_items"] = [str(x) for x in (out.get("open_action_items") or []) if x]
+    out["discovery_questions"] = [str(x) for x in (out.get("discovery_questions") or []) if x]
     out["expansion_opportunity"] = _normalize_expansion(out.get("expansion_opportunity"))
     out["qbr_headline_stats"] = [str(x) for x in (out.get("qbr_headline_stats") or []) if x]
 
@@ -160,7 +209,7 @@ def _call_claude(payload: Dict[str, Any]) -> Dict[str, Any]:
     client = anthropic.Anthropic(api_key=api_key)
     message = client.messages.create(
         model=_MODEL,
-        max_tokens=4096,
+        max_tokens=6144,
         system=_SYSTEM_PROMPT,
         messages=[{"role": "user", "content": json.dumps(payload)}],
     )
@@ -170,6 +219,19 @@ def _call_claude(payload: Dict[str, Any]) -> Dict[str, Any]:
         data.setdefault("generated_at", _now())
         data.setdefault("se_name", _se_name())
     return data
+
+
+# ── empty defaults for new fields ──────────────────────────────────────────
+
+_EMPTY_NEW_FIELDS: Dict[str, Any] = {
+    "discovery_questions": [],
+    "technical_win_map": [],
+    "key_stakeholders": [],
+    "risk_factors": [],
+    "follow_up_email": "",
+    "competitive_angle": "",
+    "industry_proof_point": "",
+}
 
 
 # ── minimal (no-Claude) briefs ─────────────────────────────────────────────
@@ -231,6 +293,7 @@ def _customer_brief(
         "open_action_items": [],
         "demo_flow": [],
         "renewal_defense": _NA,
+        **_EMPTY_NEW_FIELDS,
     })
     return brief
 
@@ -266,6 +329,7 @@ def _prospect_brief(
         "objections": [],
         "open_action_items": [],
         "demo_flow": [],
+        **_EMPTY_NEW_FIELDS,
     })
     return brief
 
@@ -304,6 +368,26 @@ def _build_output_schema(is_customer: bool) -> Dict[str, str]:
         ),
         "open_action_items": "array of strings (concrete next steps for this specific deal)",
         "call_objectives": "array of strings (what the SE must achieve in this call)",
+        "discovery_questions": (
+            "array of strings (3-5 tailored questions the SE should ask on the call, "
+            "based on gaps in the SE notes and deal stage)"
+        ),
+        "technical_win_map": (
+            'array of { "criterion": "...", "taegis_answer": "..." } '
+            "(map each item from technical_win_criteria to a specific Taegis capability)"
+        ),
+        "key_stakeholders": (
+            'array of { "name": "...", "location": "...", "role_or_relevance": "..." } '
+            "(extract from edr_landscape contacts; note their relevance to the deal)"
+        ),
+        "risk_factors": (
+            'array of { "risk": "...", "mitigation": "..." } '
+            "(2-4 deal risks inferred from SE notes, with suggested mitigations)"
+        ),
+        "follow_up_email": (
+            "string (a short 3-5 sentence follow-up email draft the SE can send after the call, "
+            "referencing key pain points and proposed next steps)"
+        ),
     }
     if is_customer:
         schema["expansion_opportunity"] = '{ "surface": "...", "risk": "...", "product": "..." }'
@@ -323,16 +407,21 @@ def _build_instruction(
         "Fill every key; use empty string or empty array if not applicable. "
         "objections: array of objects with keys objection and rebuttal. "
         "demo_flow: array of objects with keys screen, duration_mins, talking_point. "
-        "Use the se_notes, business_challenges, edr_landscape, and company_profile fields in opp "
-        "to make every section specific — avoid generic advice."
+        "technical_win_map: array of objects with keys criterion and taegis_answer. "
+        "key_stakeholders: array of objects with keys name, location, role_or_relevance. "
+        "risk_factors: array of objects with keys risk and mitigation. "
+        "Use the se_notes, business_challenges, edr_landscape, company_profile, and "
+        "technical_win_criteria fields in opp to make every section specific — avoid generic advice."
     ]
 
     if edr_landscape:
         tools = ", ".join(sorted({e.get("edr", "") for e in edr_landscape if e.get("edr")}))
+        contacts_count = sum(len(e.get("contacts") or []) for e in edr_landscape)
         parts.append(
             f"The customer runs {len(edr_landscape)} different endpoint security tools "
-            f"across their locations ({tools}). Use this fragmented EDR landscape as a "
-            "core pain point and differentiation angle."
+            f"across their locations ({tools}), with {contacts_count} known contacts. "
+            "Use this fragmented EDR landscape as a core pain point and differentiation angle. "
+            "Extract contacts into key_stakeholders with their location and inferred relevance."
         )
 
     ctu_pubs = taegis_context.get("ctu_publications") or []

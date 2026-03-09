@@ -51,6 +51,30 @@ When an API cannot be reached (missing credentials or request failure), that ste
 
 Mode is **auto-detected**: if the opportunity has a `taegis_tenant_id`, the app uses **customer** mode; otherwise **prospect**.
 
+## Brief output sections
+
+Every generated brief includes these sections (sections auto-hide when empty):
+
+| Section | Description |
+|---------|-------------|
+| **Deal snapshot** | 2-3 sentence summary of the deal context, referencing SE notes and business challenges |
+| **ROI hook** | One compelling sentence with real numbers — breach cost, headcount replacement, MTTR delta |
+| **Competitive angle** | Why Taegis beats the named incumbent, referencing the specific EDR tools in the landscape |
+| **Industry proof point** | Third-party stat or CTU publication relevant to the prospect's industry |
+| **Objections & rebuttals** | 3+ objection/rebuttal pairs tailored to the specific competitor |
+| **Technical win criteria map** | Each item from `technical_win_criteria` mapped to a specific Taegis capability |
+| **Demo flow** | 3-5 step demo plan with screen names, durations, and talking points |
+| **OSINT & conversation hook** | OSINT-driven insight and an opening statement for the call |
+| **Key stakeholders** | Contacts extracted from `edr_landscape` with location and inferred relevance |
+| **Risk factors & mitigations** | 2-4 deal risks from SE notes with concrete mitigation strategies |
+| **Call objectives** | What the SE must achieve on this call |
+| **Discovery questions** | 3-5 tailored questions based on gaps in existing SE notes |
+| **Open action items** | Concrete next steps for the deal |
+| **Follow-up email draft** | A short post-call email the SE can send, referencing key pain points |
+| **Expansion opportunity** | *(customer only)* — surface, risk, and recommended Sophos product |
+| **Renewal defense** | *(customer only)* — narrative for defending the renewal |
+| **QBR headline stats** | *(customer only)* — 3-5 stats from real telemetry |
+
 ## AI knowledge base
 
 The synthesizer is powered by a comprehensive system prompt (`agents/system_prompt.txt`) that encodes domain expertise across six areas:
@@ -62,7 +86,7 @@ The synthesizer is powered by a comprehensive system prompt (`agents/system_prom
 | **Competitive intel** | CrowdStrike, SentinelOne, Microsoft, Palo Alto, Splunk — specific win angles and objection rebuttals |
 | **Industry threats** | Healthcare, Financial Services, Manufacturing/OT, Technology — attack patterns, compliance, proof points |
 | **ROI framework** | Breach cost avoidance ($4.88M avg), headcount replacement (2-4 FTE), Taegis MTTD/MTTR benchmarks |
-| **SE behavioral rules** | 7 rules: deal-stage matching, use numbers, reference named competitor, OSINT hooks, customer-mode telemetry, expansion priorities, migration angle |
+| **SE behavioral rules** | 12 rules: deal-stage matching, use numbers, reference named competitor, OSINT hooks, customer-mode telemetry, expansion priorities, migration angle, discovery questions, technical win mapping, stakeholder extraction, risk analysis, follow-up email drafting |
 
 The prompt is stored as a plain-text file so it can be reviewed, versioned, and updated independently of the Python code.
 
@@ -139,5 +163,5 @@ DealWisperer/
 ---
 
 <p align="center">
-  Built with care by Stefan, with guidance from Claude and Cursor.
+  Built with <3 by Stefan, with guidance from Claude and Cursor.
 </p>

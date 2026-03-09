@@ -25,6 +25,13 @@
       --warning:        #D97706;
       --warning-bg:     #FFFBEB;
       --error:          #DC2626;
+      --error-bg:       #FEF2F2;
+      --purple:         #6D28D9;
+      --purple-bg:      #F5F3FF;
+      --purple-border:  #DDD6FE;
+      --teal:           #0D9488;
+      --teal-bg:        #F0FDFA;
+      --teal-border:    #99F6E4;
       --radius:         8px;
       --radius-lg:      12px;
       --shadow:         0 1px 3px rgba(0, 91, 200, 0.08);
@@ -66,7 +73,7 @@
       font-weight: 700;
       color: var(--gray-900);
     }
-    .logo-text span { color: var(--sophos-blue); }
+    .logo-text span { color: var(--gray-900); }
     .api-pills {
       display: flex;
       gap: 6px;
@@ -274,6 +281,12 @@
       background: var(--gray-100);
       color: var(--gray-700);
     }
+    .mood-reason {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      margin-top: 8px;
+      font-style: italic;
+    }
     .roi-hook {
       background: var(--warning-bg);
       border-left: 4px solid var(--warning);
@@ -342,10 +355,100 @@
     .demo-flow-item .duration { font-size: 0.8125rem; color: var(--gray-500); margin-left: 6px; }
     .demo-flow-item .talking { color: var(--gray-700); margin-top: 6px; font-size: 0.9375rem; }
     .osint-section {
-      background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
-      border: 1px solid #DDD6FE;
+      background: linear-gradient(135deg, var(--purple-bg) 0%, #EDE9FE 100%);
+      border: 1px solid var(--purple-border);
     }
-    .osint-section .section-title { color: #6D28D9; }
+    .osint-section .section-title { color: var(--purple); }
+    .competitive-section {
+      background: linear-gradient(135deg, var(--error-bg) 0%, #FEE2E2 100%);
+      border: 1px solid #FECACA;
+    }
+    .competitive-section .section-title { color: var(--error); }
+    .stakeholder-section {
+      background: linear-gradient(135deg, var(--teal-bg) 0%, #CCFBF1 100%);
+      border: 1px solid var(--teal-border);
+    }
+    .stakeholder-section .section-title { color: var(--teal); }
+    .risk-section {
+      background: linear-gradient(135deg, var(--warning-bg) 0%, #FEF3C7 100%);
+      border: 1px solid #FDE68A;
+    }
+    .risk-section .section-title { color: var(--warning); }
+    .email-section {
+      background: var(--gray-50);
+      border: 1px dashed var(--gray-300);
+    }
+    .email-section .section-title { color: var(--gray-700); }
+    .email-body {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      color: var(--gray-700);
+      line-height: 1.65;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+    }
+    .win-map-item {
+      margin-bottom: 14px;
+      padding: 14px 18px;
+      background: var(--gray-50);
+      border-radius: var(--radius);
+      border-left: 3px solid var(--success);
+    }
+    .win-map-item:last-child { margin-bottom: 0; }
+    .win-map-item .criterion {
+      font-weight: 600;
+      color: var(--gray-900);
+      font-size: 0.9375rem;
+      margin-bottom: 6px;
+    }
+    .win-map-item .answer {
+      color: var(--gray-600);
+      font-size: 0.9375rem;
+      line-height: 1.55;
+    }
+    .stakeholder-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9375rem;
+    }
+    .stakeholder-table th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--gray-900);
+      padding: 10px 14px;
+      border-bottom: 2px solid var(--teal-border);
+      font-size: 0.8125rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .stakeholder-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--gray-200);
+      color: var(--gray-700);
+    }
+    .stakeholder-table tr:last-child td { border-bottom: none; }
+    .risk-card {
+      background: var(--white);
+      border: 1px solid #FDE68A;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+    .risk-card:last-child { margin-bottom: 0; }
+    .risk-card .risk-label {
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+      font-size: 0.9375rem;
+    }
+    .risk-card .mitigation {
+      color: var(--gray-600);
+      font-size: 0.9375rem;
+      line-height: 1.55;
+      padding-left: 4px;
+    }
     .qbr-stats { list-style: none; padding: 0; margin: 0; }
     .qbr-stats li {
       margin: 10px 0;
@@ -356,7 +459,7 @@
       line-height: 1.5;
     }
     .qbr-stats li::before {
-      content: '✓';
+      content: '\2713';
       position: absolute;
       left: 0;
       color: var(--success);
@@ -376,6 +479,23 @@
       margin-top: 12px;
     }
     .no-access-banner strong { color: var(--gray-700); }
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      margin: 8px 0;
+      padding-left: 28px;
+      position: relative;
+      font-size: 0.9375rem;
+      color: var(--gray-700);
+      line-height: 1.5;
+    }
+    .checklist li::before {
+      content: '\25CB';
+      position: absolute;
+      left: 0;
+      color: var(--sophos-blue);
+      font-weight: 700;
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -383,7 +503,7 @@
     <div class="header-left">
       <div class="logo-wrap">
         <img src="https://docs.taegis.secureworks.com/img/taegis.svg" alt="Taegis" class="taegis-logo">
-        <span class="logo-text">Deal <span>Whisperer</span></span>
+        <span class="logo-text">Taegis Deal Whisperer</span>
       </div>
     </div>
     <div class="api-pills" id="apiPills">
@@ -425,35 +545,89 @@
       </div>
       <div class="brief-card" id="briefCard">
         <div class="brief-header">
-          <h1 id="briefCompany">—</h1>
+          <h1 id="briefCompany">&mdash;</h1>
           <div class="badges" id="briefBadges"></div>
+          <div class="mood-reason" id="briefMoodReason"></div>
           <div class="no-access-banner" id="noAccessBanner" style="display: none;"></div>
         </div>
+
         <div class="roi-hook" id="briefRoiHook"></div>
+
         <div class="section" id="sectionSnapshot">
           <div class="section-title">Deal snapshot</div>
           <div class="section-body" id="briefSnapshot"></div>
         </div>
+
+        <div class="section competitive-section" id="sectionCompetitive">
+          <div class="section-title">Competitive angle</div>
+          <div class="section-body" id="briefCompetitive"></div>
+        </div>
+
+        <div class="section" id="sectionIndustryProof">
+          <div class="section-title">Industry proof point</div>
+          <div class="section-body" id="briefIndustryProof"></div>
+        </div>
+
         <div class="section" id="sectionObjections">
-          <div class="section-title">Objections & rebuttals</div>
+          <div class="section-title">Objections &amp; rebuttals</div>
           <div id="briefObjections"></div>
         </div>
+
+        <div class="section" id="sectionWinMap">
+          <div class="section-title">Technical win criteria map</div>
+          <div id="briefWinMap"></div>
+        </div>
+
         <div class="section" id="sectionDemoFlow">
           <div class="section-title">Demo flow</div>
           <div id="briefDemoFlow"></div>
         </div>
+
         <div class="section osint-section" id="sectionOsint">
-          <div class="section-title">OSINT & conversation hook</div>
+          <div class="section-title">OSINT &amp; conversation hook</div>
           <div class="section-body" id="briefOsint"></div>
         </div>
+
+        <div class="section stakeholder-section" id="sectionStakeholders">
+          <div class="section-title">Key stakeholders</div>
+          <div id="briefStakeholders"></div>
+        </div>
+
+        <div class="section risk-section" id="sectionRisks">
+          <div class="section-title">Risk factors &amp; mitigations</div>
+          <div id="briefRisks"></div>
+        </div>
+
+        <div class="section" id="sectionCallObjectives">
+          <div class="section-title">Call objectives</div>
+          <div class="section-body" id="briefCallObjectives"></div>
+        </div>
+
+        <div class="section" id="sectionDiscovery">
+          <div class="section-title">Discovery questions</div>
+          <div class="section-body" id="briefDiscovery"></div>
+        </div>
+
         <div class="section" id="sectionActionItems">
           <div class="section-title">Open action items</div>
           <div class="section-body" id="briefActionItems"></div>
         </div>
+
+        <div class="section email-section" id="sectionEmail">
+          <div class="section-title">Follow-up email draft</div>
+          <div class="email-body" id="briefEmail"></div>
+        </div>
+
         <div class="section" id="sectionExpansion">
           <div class="section-title">Expansion opportunity</div>
           <div class="section-body expansion-block" id="briefExpansion"></div>
         </div>
+
+        <div class="section" id="sectionRenewal">
+          <div class="section-title">Renewal defense</div>
+          <div class="section-body" id="briefRenewal"></div>
+        </div>
+
         <div class="section" id="sectionQbr">
           <div class="section-title">QBR headline stats</div>
           <ul class="qbr-stats" id="briefQbr"></ul>
@@ -464,31 +638,43 @@
   <script>
     function esc(str) {
       if (str == null || str === undefined) return '';
-      const div = document.createElement('div');
+      var div = document.createElement('div');
       div.textContent = str;
       return div.innerHTML;
     }
 
+    function show(id, visible) {
+      document.getElementById(id).style.display = visible ? 'block' : 'none';
+    }
+
     function checkHealth() {
       fetch('/health')
-        .then(r => r.json())
-        .then(data => {
-          const apis = data.apis || {};
-          document.querySelectorAll('.pill[data-api]').forEach(pill => {
-            const key = pill.getAttribute('data-api');
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var apis = data.apis || {};
+          document.querySelectorAll('.pill[data-api]').forEach(function(pill) {
+            var key = pill.getAttribute('data-api');
             if (apis[key]) pill.classList.add('on');
             else pill.classList.remove('on');
           });
         })
-        .catch(() => {});
+        .catch(function() {});
     }
 
     function setStatus(msg, type) {
-      const bar = document.getElementById('statusBar');
+      var bar = document.getElementById('statusBar');
       bar.textContent = msg;
       bar.classList.add('visible');
       bar.classList.remove('loading', 'error', 'success');
       if (type) bar.classList.add(type);
+    }
+
+    function renderList(items, elId) {
+      var el = document.getElementById(elId);
+      if (!items || !items.length) { el.innerHTML = ''; return; }
+      el.innerHTML = '<ul class="checklist">' + items.map(function(a) {
+        return '<li>' + esc(a) + '</li>';
+      }).join('') + '</ul>';
     }
 
     function renderBrief(brief) {
@@ -496,14 +682,22 @@
       document.getElementById('briefCard').classList.add('visible');
       document.getElementById('quickActions').classList.add('visible');
 
-      const company = brief.company || '—';
+      var company = brief.company || '\u2014';
       document.getElementById('briefCompany').textContent = company;
 
-      const mode = brief.mode || 'prospect';
-      const mood = brief.deal_mood || '';
-      let badgesHtml = '<span class="badge mode-' + esc(mode) + '">' + (mode === 'customer' ? 'Customer' : 'Prospect') + '</span>';
+      var mode = brief.mode || 'prospect';
+      var isProspect = mode === 'prospect';
+      var isCustomer = mode === 'customer';
+      var mood = brief.deal_mood || '';
+      var badgesHtml = '<span class="badge mode-' + esc(mode) + '">'
+        + (isCustomer ? 'Customer' : 'Prospect') + '</span>';
       if (mood) badgesHtml += '<span class="badge mood">' + esc(mood) + '</span>';
       document.getElementById('briefBadges').innerHTML = badgesHtml;
+
+      var moodReason = brief.deal_mood_reason || '';
+      var moodEl = document.getElementById('briefMoodReason');
+      moodEl.textContent = moodReason;
+      moodEl.style.display = moodReason ? 'block' : 'none';
 
       var noAccess = brief.no_access_sources || [];
       var bannerEl = document.getElementById('noAccessBanner');
@@ -519,76 +713,137 @@
 
       document.getElementById('briefSnapshot').textContent = brief.deal_snapshot || '';
 
-      const objections = brief.objections || [];
-      document.getElementById('sectionObjections').style.display = objections.length ? 'block' : 'none';
-      document.getElementById('briefObjections').innerHTML = objections.map(o =>
-        '<div class="objection-card"><div class="q">' + esc(o.objection) + '</div><div class="a">' + esc(o.rebuttal) + '</div></div>'
-      ).join('');
+      var competitive = brief.competitive_angle || '';
+      show('sectionCompetitive', !!competitive);
+      document.getElementById('briefCompetitive').textContent = competitive;
 
-      const demoFlow = brief.demo_flow || [];
-      document.getElementById('sectionDemoFlow').style.display = demoFlow.length ? 'block' : 'none';
-      document.getElementById('briefDemoFlow').innerHTML = demoFlow.map((d, i) =>
-        '<div class="demo-flow-item"><span class="screen">' + (i + 1) + '. ' + esc(d.screen) + '</span><span class="duration">(' + (d.duration_mins || 0) + ' min)</span><div class="talking">' + esc(d.talking_point) + '</div></div>'
-      ).join('');
+      var industryProof = brief.industry_proof_point || '';
+      show('sectionIndustryProof', !!industryProof);
+      document.getElementById('briefIndustryProof').textContent = industryProof;
 
-      const isProspect = mode === 'prospect';
-      document.getElementById('sectionOsint').style.display = isProspect && (brief.osint_insight || brief.conversation_hook) ? 'block' : 'none';
-      let osintHtml = '';
+      var objections = brief.objections || [];
+      show('sectionObjections', objections.length > 0);
+      document.getElementById('briefObjections').innerHTML = objections.map(function(o) {
+        return '<div class="objection-card"><div class="q">' + esc(o.objection)
+          + '</div><div class="a">' + esc(o.rebuttal) + '</div></div>';
+      }).join('');
+
+      var winMap = brief.technical_win_map || [];
+      show('sectionWinMap', winMap.length > 0);
+      document.getElementById('briefWinMap').innerHTML = winMap.map(function(t) {
+        return '<div class="win-map-item"><div class="criterion">' + esc(t.criterion)
+          + '</div><div class="answer">' + esc(t.taegis_answer) + '</div></div>';
+      }).join('');
+
+      var demoFlow = brief.demo_flow || [];
+      show('sectionDemoFlow', demoFlow.length > 0);
+      document.getElementById('briefDemoFlow').innerHTML = demoFlow.map(function(d, i) {
+        return '<div class="demo-flow-item"><span class="screen">' + (i + 1)
+          + '. ' + esc(d.screen) + '</span><span class="duration">('
+          + (d.duration_mins || 0) + ' min)</span><div class="talking">'
+          + esc(d.talking_point) + '</div></div>';
+      }).join('');
+
+      var hasOsint = isProspect && (brief.osint_insight || brief.conversation_hook);
+      show('sectionOsint', hasOsint);
+      var osintHtml = '';
       if (brief.osint_insight) osintHtml += '<p style="margin:0 0 12px 0"><strong>OSINT insight:</strong> ' + esc(brief.osint_insight) + '</p>';
       if (brief.conversation_hook) osintHtml += '<p style="margin:0"><strong>Conversation hook:</strong> ' + esc(brief.conversation_hook) + '</p>';
-      document.getElementById('briefOsint').innerHTML = osintHtml || '—';
+      document.getElementById('briefOsint').innerHTML = osintHtml || '\u2014';
 
-      const actionItems = brief.open_action_items || [];
-      document.getElementById('sectionActionItems').style.display = actionItems.length ? 'block' : 'none';
+      var stakeholders = brief.key_stakeholders || [];
+      show('sectionStakeholders', stakeholders.length > 0);
+      if (stakeholders.length) {
+        document.getElementById('briefStakeholders').innerHTML =
+          '<table class="stakeholder-table"><thead><tr>'
+          + '<th>Name</th><th>Location</th><th>Relevance</th>'
+          + '</tr></thead><tbody>'
+          + stakeholders.map(function(s) {
+            return '<tr><td>' + esc(s.name) + '</td><td>' + esc(s.location)
+              + '</td><td>' + esc(s.role_or_relevance) + '</td></tr>';
+          }).join('')
+          + '</tbody></table>';
+      }
+
+      var risks = brief.risk_factors || [];
+      show('sectionRisks', risks.length > 0);
+      document.getElementById('briefRisks').innerHTML = risks.map(function(r) {
+        return '<div class="risk-card"><div class="risk-label">' + esc(r.risk)
+          + '</div><div class="mitigation"><strong>Mitigation:</strong> '
+          + esc(r.mitigation) + '</div></div>';
+      }).join('');
+
+      var callObjectives = brief.call_objectives || [];
+      show('sectionCallObjectives', callObjectives.length > 0);
+      renderList(callObjectives, 'briefCallObjectives');
+
+      var discovery = brief.discovery_questions || [];
+      show('sectionDiscovery', discovery.length > 0);
+      renderList(discovery, 'briefDiscovery');
+
+      var actionItems = brief.open_action_items || [];
+      show('sectionActionItems', actionItems.length > 0);
       document.getElementById('briefActionItems').innerHTML = actionItems.length
-        ? '<ul style="margin:0; padding-left:20px">' + actionItems.map(a => '<li style="margin:6px 0">' + esc(a) + '</li>').join('') + '</ul>'
+        ? '<ul style="margin:0; padding-left:20px">' + actionItems.map(function(a) {
+          return '<li style="margin:6px 0">' + esc(a) + '</li>';
+        }).join('') + '</ul>'
         : '';
 
-      const expansion = brief.expansion_opportunity;
-      document.getElementById('sectionExpansion').style.display = expansion && mode === 'customer' ? 'block' : 'none';
+      var email = brief.follow_up_email || '';
+      show('sectionEmail', !!email);
+      document.getElementById('briefEmail').textContent = email;
+
+      var expansion = brief.expansion_opportunity;
+      show('sectionExpansion', expansion && isCustomer);
       if (expansion && typeof expansion === 'object') {
         document.getElementById('briefExpansion').innerHTML =
           '<p><strong>Surface:</strong> ' + esc(expansion.surface) + '</p>' +
           '<p><strong>Risk:</strong> ' + esc(expansion.risk) + '</p>' +
           '<p><strong>Product:</strong> ' + esc(expansion.product) + '</p>';
       } else {
-        document.getElementById('briefExpansion').textContent = expansion || '—';
+        document.getElementById('briefExpansion').textContent = expansion || '\u2014';
       }
 
-      const qbrStats = brief.qbr_headline_stats || [];
-      document.getElementById('sectionQbr').style.display = qbrStats.length && mode === 'customer' ? 'block' : 'none';
-      document.getElementById('briefQbr').innerHTML = qbrStats.map(s => '<li>' + esc(s) + '</li>').join('');
+      var renewalDefense = brief.renewal_defense || '';
+      show('sectionRenewal', !!renewalDefense && isCustomer);
+      document.getElementById('briefRenewal').textContent = renewalDefense;
+
+      var qbrStats = brief.qbr_headline_stats || [];
+      show('sectionQbr', qbrStats.length > 0 && isCustomer);
+      document.getElementById('briefQbr').innerHTML = qbrStats.map(function(s) {
+        return '<li>' + esc(s) + '</li>';
+      }).join('');
     }
 
     function generate() {
-      const oppName = document.getElementById('oppName').value.trim();
+      var oppName = document.getElementById('oppName').value.trim();
       if (!oppName) { setStatus('Enter an opportunity name.', 'error'); return; }
-      setStatus('Generating…', 'loading');
+      setStatus('Generating\u2026', 'loading');
       document.getElementById('btnGenerate').disabled = true;
       fetch('/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ opp_name: oppName })
       })
-        .then(r => {
-          if (!r.ok) return r.json().then(j => { throw new Error(j.error || r.statusText); });
+        .then(function(r) {
+          if (!r.ok) return r.json().then(function(j) { throw new Error(j.error || r.statusText); });
           return r.json();
         })
-        .then(brief => { renderBrief(brief); setStatus('Brief ready.', 'success'); })
-        .catch(err => { setStatus('Error: ' + err.message, 'error'); })
-        .finally(() => { document.getElementById('btnGenerate').disabled = false; });
+        .then(function(brief) { renderBrief(brief); setStatus('Brief ready.', 'success'); })
+        .catch(function(err) { setStatus('Error: ' + err.message, 'error'); })
+        .finally(function() { document.getElementById('btnGenerate').disabled = false; });
     }
 
     function generateManual() {
-      const company = document.getElementById('manualCompany').value.trim();
+      var company = document.getElementById('manualCompany').value.trim();
       if (!company) { setStatus('Enter company name.', 'error'); return; }
-      setStatus('Generating…', 'loading');
+      setStatus('Generating\u2026', 'loading');
       document.getElementById('btnManualGenerate').disabled = true;
       fetch('/quick-brief', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          company,
+          company: company,
           industry: document.getElementById('manualIndustry').value.trim(),
           stage: document.getElementById('manualStage').value.trim(),
           competitor: document.getElementById('manualCompetitor').value.trim(),
@@ -596,23 +851,23 @@
           notes: document.getElementById('manualNotes').value.trim()
         })
       })
-        .then(r => {
-          if (!r.ok) return r.json().then(j => { throw new Error(j.error || r.statusText); });
+        .then(function(r) {
+          if (!r.ok) return r.json().then(function(j) { throw new Error(j.error || r.statusText); });
           return r.json();
         })
-        .then(brief => { renderBrief(brief); setStatus('Brief ready.', 'success'); })
-        .catch(err => { setStatus('Error: ' + err.message, 'error'); })
-        .finally(() => { document.getElementById('btnManualGenerate').disabled = false; });
+        .then(function(brief) { renderBrief(brief); setStatus('Brief ready.', 'success'); })
+        .catch(function(err) { setStatus('Error: ' + err.message, 'error'); })
+        .finally(function() { document.getElementById('btnManualGenerate').disabled = false; });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
       checkHealth();
-      document.querySelectorAll('.tab').forEach(t => {
+      document.querySelectorAll('.tab').forEach(function(t) {
         t.addEventListener('click', function() {
-          document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-          document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+          document.querySelectorAll('.tab').forEach(function(x) { x.classList.remove('active'); });
+          document.querySelectorAll('.panel').forEach(function(x) { x.classList.remove('active'); });
           this.classList.add('active');
-          const tab = this.getAttribute('data-tab');
+          var tab = this.getAttribute('data-tab');
           document.getElementById('panel' + (tab === 'vivun' ? 'Vivun' : 'Manual')).classList.add('active');
         });
       });
