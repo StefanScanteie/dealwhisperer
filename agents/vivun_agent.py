@@ -37,6 +37,7 @@ def _normalize(raw: Dict[str, Any], notes: List[Dict[str, Any]]) -> Dict[str, An
         "competitor": raw.get("primary_competitor") or raw.get("competitor") or "",
         "products_scoped": raw.get("products_scoped") or raw.get("products") or ["Taegis XDR"],
         "taegis_tenant_id": raw.get("taegis_tenant_id") or raw.get("customer_tenant_id"),
+        "taegis_region": raw.get("taegis_region") or raw.get("region"),
         "account_executive": raw.get("account_executive") or raw.get("ae_name") or "",
         "se_notes": notes,
         "technical_win_criteria": raw.get("technical_win_criteria") or raw.get("tech_win_criteria") or "",

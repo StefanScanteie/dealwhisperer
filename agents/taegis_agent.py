@@ -26,8 +26,16 @@ import requests
 
 log = logging.getLogger(__name__)
 
-_DEFAULT_BASE = "https://api.taegis.secureworks.com"
+_DEFAULT_BASE = "https://api.ctpx.secureworks.com"
 _LOOKBACK_DAYS = 90
+
+_REGION_URLS: Dict[str, str] = {
+    "US1": "https://api.ctpx.secureworks.com",
+    "US2": "https://api.delta.taegis.secureworks.com",
+    "US3": "https://api.foxtrot.taegis.secureworks.com",
+    "EU1": "https://api.echo.taegis.secureworks.com",
+    "EU2": "https://api.golf.taegis.secureworks.com",
+}
 
 # Keywords used to filter CTU publications by industry
 _INDUSTRY_KEYWORDS: Dict[str, List[str]] = {
@@ -48,11 +56,21 @@ def _has_creds() -> bool:
     return bool(os.getenv("TAEGIS_CLIENT_ID") and os.getenv("TAEGIS_CLIENT_SECRET"))
 
 
-def _get_token() -> tuple[str, str]:
+def _resolve_base(region: Optional[str] = None) -> str:
+    """Return the API base URL for a region code, falling back to env/default."""
+    if region:
+        url = _REGION_URLS.get(region.upper())
+        if url:
+            return url
+        log.warning("Unknown Taegis region '%s' — falling back to env/default.", region)
+    return os.getenv("TAEGIS_BASE_URL", _DEFAULT_BASE).rstrip("/")
+
+
+def _get_token(region: Optional[str] = None) -> tuple[str, str]:
     """Acquire a bearer token; returns (token, base_url)."""
     cid = os.getenv("TAEGIS_CLIENT_ID", "")
     sec = os.getenv("TAEGIS_CLIENT_SECRET", "")
-    base = os.getenv("TAEGIS_BASE_URL", _DEFAULT_BASE).rstrip("/")
+    base = _resolve_base(region)
     if not (cid and sec):
         raise RuntimeError("Taegis credentials not configured")
     resp = requests.post(
@@ -276,7 +294,7 @@ def _get_ctpx_customer_telemetry(tenant_id: str, token: str, base: str) -> Dict[
 
 # ── public API ───────────────────────────────────────────────────────────────
 
-def get_industry_intel(vertical: str) -> Optional[Dict[str, Any]]:
+def get_industry_intel(vertical: str, region: Optional[str] = None) -> Optional[Dict[str, Any]]:
     """
     Fetch threat intel for a vertical (prospect mode).
 
@@ -289,7 +307,7 @@ def get_industry_intel(vertical: str) -> Optional[Dict[str, Any]]:
         log.warning("Taegis credentials not set — skipping industry intel.")
         return None
     try:
-        token, base = _get_token()
+        token, base = _get_token(region)
         if _is_ctpx(base):
             log.info("CTPX detected — using CTU Threat Intelligence publications for '%s'.", vertical)
             return _get_ctpx_industry_intel(vertical, token, base)
@@ -324,7 +342,7 @@ def get_industry_intel(vertical: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-def get_customer_telemetry(tenant_id: str) -> Optional[Dict[str, Any]]:
+def get_customer_telemetry(tenant_id: str, region: Optional[str] = None) -> Optional[Dict[str, Any]]:
     """
     Fetch alert summary, coverage gaps, and MDR activity for a tenant (customer mode).
 
@@ -337,7 +355,7 @@ def get_customer_telemetry(tenant_id: str) -> Optional[Dict[str, Any]]:
         log.warning("Taegis credentials not set — skipping customer telemetry.")
         return None
     try:
-        token, base = _get_token()
+        token, base = _get_token(region)
         if _is_ctpx(base):
             log.info("CTPX detected — using alertsServiceSearch for tenant %s.", tenant_id)
             return _get_ctpx_customer_telemetry(tenant_id, token, base)

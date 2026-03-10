@@ -97,26 +97,24 @@
     .header-right { display: flex; align-items: center; gap: 16px; }
     .lang-selector {
       display: flex;
-      background: #dcfce7;
       border-radius: 20px;
-      border: 1px solid rgba(21, 128, 61, 0.2);
       overflow: hidden;
+      border: 1px solid var(--gray-200);
     }
     .lang-selector button {
       padding: 6px 12px;
       border: none;
-      border-radius: 20px;
       font-size: 0.75rem;
       font-weight: 500;
-      background: transparent;
-      color: #15803d;
+      background: #fde8e8;
+      color: #b91c1c;
       cursor: pointer;
       font-family: inherit;
     }
     .lang-selector button:hover { opacity: 0.8; }
     .lang-selector button.active {
-      background: #15803d;
-      color: #fff;
+      background: #dcfce7;
+      color: #15803d;
     }
     .main {
       display: flex;
@@ -185,6 +183,44 @@
       box-shadow: 0 0 0 3px var(--sophos-blue-light);
     }
     textarea { min-height: 88px; resize: vertical; }
+    .taegis-override {
+      margin: 4px 0 8px;
+      padding: 10px 12px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+    }
+    .override-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--gray-500);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .override-row {
+      display: flex;
+      gap: 8px;
+    }
+    .override-input {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 10px !important;
+      font-size: 0.8125rem !important;
+      min-height: auto !important;
+    }
+    .override-select {
+      flex: 0 0 auto;
+      padding: 8px 6px;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      font-family: inherit;
+      background: var(--white);
+      color: var(--gray-700);
+      cursor: pointer;
+    }
     .btn-generate {
       background: var(--sophos-blue);
       color: var(--white);
@@ -554,6 +590,20 @@
       </div>
       <div id="panelVivun" class="panel active">
         <input type="text" id="oppName" data-i18n-placeholder="placeholder_opp" placeholder="e.g. Smiths Cogwheels" />
+        <div class="taegis-override">
+          <span class="override-label" data-i18n="taegis_override_label">Taegis overrides (optional)</span>
+          <div class="override-row">
+            <input type="text" id="overrideTenantId" data-i18n-placeholder="placeholder_tenant_id" placeholder="Tenant ID" class="override-input" />
+            <select id="overrideRegion" class="override-select">
+              <option value="" data-i18n="region_auto">Auto</option>
+              <option value="US1">US1 - Charlie (CTPX)</option>
+              <option value="US2">US2 - Delta</option>
+              <option value="US3">US3 - Foxtrot</option>
+              <option value="EU1">EU1 - Echo</option>
+              <option value="EU2">EU2 - Golf</option>
+            </select>
+          </div>
+        </div>
         <button type="button" class="btn-generate" id="btnGenerate" data-i18n="btn_generate">Generate brief</button>
       </div>
       <div id="panelManual" class="panel">
@@ -563,6 +613,20 @@
         <input type="text" id="manualCompetitor" data-i18n-placeholder="placeholder_competitor" placeholder="Competitor" />
         <input type="text" id="manualPain" data-i18n-placeholder="placeholder_pain" placeholder="Pain / win criteria" />
         <textarea id="manualNotes" data-i18n-placeholder="placeholder_notes" placeholder="Notes"></textarea>
+        <div class="taegis-override">
+          <span class="override-label" data-i18n="taegis_override_label">Taegis overrides (optional)</span>
+          <div class="override-row">
+            <input type="text" id="manualOverrideTenantId" data-i18n-placeholder="placeholder_tenant_id" placeholder="Tenant ID" class="override-input" />
+            <select id="manualOverrideRegion" class="override-select">
+              <option value="" data-i18n="region_auto">Auto</option>
+              <option value="US1">US1 - Charlie (CTPX)</option>
+              <option value="US2">US2 - Delta</option>
+              <option value="US3">US3 - Foxtrot</option>
+              <option value="EU1">EU1 - Echo</option>
+              <option value="EU2">EU2 - Golf</option>
+            </select>
+          </div>
+        </div>
         <button type="button" class="btn-generate" id="btnManualGenerate" data-i18n="btn_generate">Generate brief</button>
       </div>
       <div class="status-bar" id="statusBar"></div>
@@ -718,7 +782,10 @@
         mitigation_label: 'Mitigation:',
         expansion_surface: 'Surface:',
         expansion_risk: 'Risk:',
-        expansion_product: 'Product:'
+        expansion_product: 'Product:',
+        taegis_override_label: 'Taegis overrides (optional)',
+        placeholder_tenant_id: 'Tenant ID',
+        region_auto: 'Auto'
       },
       ja: {
         left_label: 'ブリーフを生成',
@@ -767,7 +834,10 @@
         mitigation_label: '対策:',
         expansion_surface: '対象:',
         expansion_risk: 'リスク:',
-        expansion_product: '製品:'
+        expansion_product: '製品:',
+        taegis_override_label: 'Taegisオーバーライド（任意）',
+        placeholder_tenant_id: 'テナントID',
+        region_auto: '自動'
       }
     };
 
@@ -991,7 +1061,12 @@
       fetch('/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ opp_name: oppName, language: getCurrentLang() })
+        body: JSON.stringify({
+          opp_name: oppName,
+          language: getCurrentLang(),
+          taegis_tenant_id: document.getElementById('overrideTenantId').value.trim() || undefined,
+          taegis_region: document.getElementById('overrideRegion').value || undefined
+        })
       })
         .then(function(r) {
           if (!r.ok) return r.json().then(function(j) { throw new Error(j.error || r.statusText); });
@@ -1018,7 +1093,9 @@
           competitor: document.getElementById('manualCompetitor').value.trim(),
           pain: document.getElementById('manualPain').value.trim(),
           notes: document.getElementById('manualNotes').value.trim(),
-          language: getCurrentLang()
+          language: getCurrentLang(),
+          taegis_tenant_id: document.getElementById('manualOverrideTenantId').value.trim() || undefined,
+          taegis_region: document.getElementById('manualOverrideRegion').value || undefined
         })
       })
         .then(function(r) {

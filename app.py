@@ -88,20 +88,34 @@ def generate():
     if opp is None:
         return jsonify(error="Opportunity not found (No Access: Vivun)"), 404
 
+    # SE overrides from the UI (take precedence over Vivun data)
+    override_tenant = (body.get("taegis_tenant_id") or "").strip()
+    override_region = (body.get("taegis_region") or "").strip()
+    if override_tenant:
+        opp["taegis_tenant_id"] = override_tenant
+        log.info("SE override: taegis_tenant_id = %s", override_tenant)
+    if override_region:
+        opp["taegis_region"] = override_region
+        log.info("SE override: taegis_region = %s", override_region)
+
     is_customer = is_existing_customer(opp)
     log.info("Mode: %s | Stage: %s | Competitor: %s",
              "CUSTOMER" if is_customer else "PROSPECT",
              opp.get("stage", ""), opp.get("competitor", ""))
 
     # 2 — Taegis
+    region = opp.get("taegis_region")
+    if is_customer and not region:
+        log.warning("Customer tenant %s has no taegis_region — using default. "
+                    "Set region in opportunity data for accuracy.", opp.get("taegis_tenant_id"))
     if is_customer:
         tenant_id = opp.get("taegis_tenant_id") or "unknown"
-        taegis_data = get_customer_telemetry(tenant_id)
+        taegis_data = get_customer_telemetry(tenant_id, region=region)
         if taegis_data is None:
             log.info("Customer telemetry unavailable — falling back to industry intel.")
-            taegis_data = get_industry_intel(opp.get("industry") or "Healthcare")
+            taegis_data = get_industry_intel(opp.get("industry") or "Healthcare", region=region)
     else:
-        taegis_data = get_industry_intel(opp.get("industry") or "Healthcare")
+        taegis_data = get_industry_intel(opp.get("industry") or "Healthcare", region=region)
 
     # 3 — OSINT (prospect only)
     company_name = opp.get("company_name") or opp.get("name") or opp_name
@@ -143,7 +157,8 @@ def quick_brief():
         "close_date": "",
         "competitor": (body.get("competitor") or "").strip(),
         "products_scoped": ["Taegis XDR", "Taegis MDR"],
-        "taegis_tenant_id": None,
+        "taegis_tenant_id": (body.get("taegis_tenant_id") or "").strip() or None,
+        "taegis_region": (body.get("taegis_region") or "").strip() or None,
         "account_executive": "",
         "se_notes": [{
             "date": "",
@@ -153,9 +168,19 @@ def quick_brief():
         "technical_win_criteria": (body.get("pain") or "").strip(),
     }
 
+    is_customer = is_existing_customer(opp)
+    region = opp.get("taegis_region")
+    taegis_data = None
+    if is_customer:
+        log.info("Manual input with tenant %s (region %s) — fetching telemetry.",
+                 opp["taegis_tenant_id"], region or "default")
+        taegis_data = get_customer_telemetry(opp["taegis_tenant_id"], region=region)
+        if taegis_data is None:
+            taegis_data = get_industry_intel(opp.get("industry") or "General", region=region)
+
     language = _parse_language(body)
-    brief = generate_brief(opp, None, None, is_customer=False, language=language)
-    brief["no_access_sources"] = _no_access_list(None, None, brief, is_customer=False)
+    brief = generate_brief(opp, taegis_data, None, is_customer=is_customer, language=language)
+    brief["no_access_sources"] = _no_access_list(taegis_data, None, brief, is_customer=is_customer)
     return jsonify(brief)
 
 

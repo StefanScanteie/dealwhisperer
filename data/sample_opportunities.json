@@ -10,6 +10,7 @@
     "competitor": "CrowdStrike",
     "products_scoped": ["Taegis XDR", "Taegis MDR"],
     "taegis_tenant_id": 96072,
+    "taegis_region": "US1",
     "account_executive": "Sarah Chen",
     "technical_win_criteria": "Unified XDR visibility across 6 heterogeneous EDR tools in 4 countries; sub-30min MTTR; cloud coverage for Azure workloads; OT/IT convergence at manufacturing plants; demonstrate attribution capability the previous SIEM lacked.",
 
