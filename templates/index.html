@@ -897,9 +897,9 @@
 
       var winMap = brief.technical_win_map || [];
       show('sectionWinMap', winMap.length > 0);
-      document.getElementById('briefWinMap').innerHTML = winMap.map(function(t) {
-        return '<div class="win-map-item"><div class="criterion">' + esc(t.criterion)
-          + '</div><div class="answer">' + esc(t.taegis_answer) + '</div></div>';
+      document.getElementById('briefWinMap').innerHTML = winMap.map(function(w) {
+        return '<div class="win-map-item"><div class="criterion">' + esc(w.criterion)
+          + '</div><div class="answer">' + esc(w.taegis_answer) + '</div></div>';
       }).join('');
 
       var demoFlow = brief.demo_flow || [];

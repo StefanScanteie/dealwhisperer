@@ -128,6 +128,7 @@ DealWisperer/
 ├── templates/
 │   └── index.html          # Single-page UI
 ├── static/
+│   ├── favicon.svg             # Taegis-branded browser tab icon
 │   └── no-brief-yet-icon.png
 ├── data/
 │   └── sample_opportunities.json   # Demo opportunity (Smiths Cogwheels)

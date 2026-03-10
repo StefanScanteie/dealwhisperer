@@ -22,7 +22,7 @@ _TOOL_KEYWORDS: Dict[str, List[str]] = {
 
 
 def _headers() -> Dict[str, str]:
-    return {"X-API-KEY": os.environ["SERPER_API_KEY"], "Content-Type": "application/json"}
+    return {"X-API-KEY": os.getenv("SERPER_API_KEY", ""), "Content-Type": "application/json"}
 
 
 def _snippets(items: List[Dict[str, Any]]) -> List[str]:

@@ -40,6 +40,14 @@ def _api_status() -> dict:
     }
 
 
+_SUPPORTED_LANGS = ("en", "ja")
+
+
+def _parse_language(body: dict) -> str:
+    lang = (body.get("language") or "en").strip().lower()
+    return lang if lang in _SUPPORTED_LANGS else "en"
+
+
 def _no_access_list(
     taegis_data, osint_data, brief: dict, *, is_customer: bool,
 ) -> list[str]:
@@ -99,9 +107,7 @@ def generate():
         osint_data = get_osint_intel(company_name, opp.get("industry") or "")
 
     # 4 — Synthesise
-    language = (body.get("language") or "en").strip().lower()
-    if language not in ("en", "ja"):
-        language = "en"
+    language = _parse_language(body)
     brief = generate_brief(
         opp, taegis_data, osint_data,
         is_customer=is_customer,
@@ -144,9 +150,7 @@ def quick_brief():
         "technical_win_criteria": (body.get("pain") or "").strip(),
     }
 
-    language = (body.get("language") or "en").strip().lower()
-    if language not in ("en", "ja"):
-        language = "en"
+    language = _parse_language(body)
     brief = generate_brief(opp, None, None, is_customer=False, language=language)
     brief["no_access_sources"] = _no_access_list(None, None, brief, is_customer=False)
     return jsonify(brief)

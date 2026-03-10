@@ -23,15 +23,6 @@ def _load_system_prompt() -> str:
 
 _SYSTEM_PROMPT = _load_system_prompt()
 
-BRIEF_KEYS = [
-    "company", "deal_stage", "deal_mood", "deal_mood_reason", "deal_snapshot",
-    "roi_hook", "objections", "demo_flow", "osint_insight", "conversation_hook",
-    "open_action_items", "call_objectives", "expansion_opportunity", "qbr_headline_stats",
-    "competitive_angle", "industry_proof_point", "renewal_defense",
-    "discovery_questions", "technical_win_map", "key_stakeholders",
-    "risk_factors", "follow_up_email",
-]
-
 _STRING_FIELDS = [
     "company", "deal_stage", "deal_mood", "deal_mood_reason", "deal_snapshot",
     "roi_hook", "osint_insight", "conversation_hook", "competitive_angle",
@@ -83,7 +74,10 @@ def _strip_fences(text: str) -> str:
         s = s.split("```", 1)[1]
         if "```" in s:
             s = s.rsplit("```", 1)[0]
-        return s.strip()
+        s = s.strip()
+        if s and s[0] not in ("{", "["):
+            s = s.split("\n", 1)[-1].strip()
+        return s
     return s
 
 
@@ -201,12 +195,21 @@ def _normalize_claude_brief(data: Dict[str, Any]) -> Dict[str, Any]:
 # ── Claude call ─────────────────────────────────────────────────────────────
 
 
-def _call_claude(payload: Dict[str, Any]) -> Dict[str, Any]:
+_anthropic_client: Optional[anthropic.Anthropic] = None
+
+
+def _get_client() -> anthropic.Anthropic:
+    global _anthropic_client
     api_key = os.getenv("ANTHROPIC_API_KEY")
     if not api_key:
         raise RuntimeError("ANTHROPIC_API_KEY not set")
+    if _anthropic_client is None:
+        _anthropic_client = anthropic.Anthropic(api_key=api_key)
+    return _anthropic_client
 
-    client = anthropic.Anthropic(api_key=api_key)
+
+def _call_claude(payload: Dict[str, Any]) -> Dict[str, Any]:
+    client = _get_client()
     message = client.messages.create(
         model=_MODEL,
         max_tokens=6144,
@@ -221,16 +224,15 @@ def _call_claude(payload: Dict[str, Any]) -> Dict[str, Any]:
     return data
 
 
-# ── empty defaults for new fields ──────────────────────────────────────────
-
-_EMPTY_NEW_FIELDS: Dict[str, Any] = {
+_EMPTY_LIST_FIELDS: Dict[str, list] = {
     "discovery_questions": [],
     "technical_win_map": [],
     "key_stakeholders": [],
     "risk_factors": [],
+}
+
+_EMPTY_STRING_FIELDS: Dict[str, str] = {
     "follow_up_email": "",
-    "competitive_angle": "",
-    "industry_proof_point": "",
 }
 
 
@@ -293,7 +295,10 @@ def _customer_brief(
         "open_action_items": [],
         "demo_flow": [],
         "renewal_defense": _NA,
-        **_EMPTY_NEW_FIELDS,
+        "competitive_angle": "",
+        "industry_proof_point": "",
+        **_EMPTY_LIST_FIELDS,
+        **_EMPTY_STRING_FIELDS,
     })
     return brief
 
@@ -329,7 +334,8 @@ def _prospect_brief(
         "objections": [],
         "open_action_items": [],
         "demo_flow": [],
-        **_EMPTY_NEW_FIELDS,
+        **_EMPTY_LIST_FIELDS,
+        **_EMPTY_STRING_FIELDS,
     })
     return brief
 

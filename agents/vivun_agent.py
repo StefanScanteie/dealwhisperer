@@ -19,7 +19,7 @@ _SAMPLE_FILE = Path(__file__).resolve().parent.parent / "data" / "sample_opportu
 
 def _headers() -> Dict[str, str]:
     return {
-        "Authorization": f"Bearer {os.environ['VIVUN_API_KEY']}",
+        "Authorization": f"Bearer {os.getenv('VIVUN_API_KEY', '')}",
         "Accept": "application/json",
     }
 
