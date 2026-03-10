@@ -128,7 +128,7 @@ DealWisperer/
 ├── templates/
 │   └── index.html          # Single-page UI
 ├── static/
-│   └── empty-state-icon.png
+│   └── no-brief-yet-icon.png
 ├── data/
 │   └── sample_opportunities.json   # Demo opportunity (Smiths Cogwheels)
 ├── docs/
