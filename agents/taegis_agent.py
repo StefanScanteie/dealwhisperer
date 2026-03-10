@@ -5,10 +5,12 @@ Auth and API are the same as documented for Taegis:
   - OAuth2 client credentials → /auth/api/v2/auth/token
   - GraphQL → {TAEGIS_BASE_URL}/graphql
 
-CTPX (api.ctpx.secureworks.com = US1) supports the Threat Intelligence API:
-  threatLatestPublications, threatWatchlist, threatIntelligence, etc.
+CTPX (api.ctpx.secureworks.com = US1) supports:
+  - Threat Intelligence API: threatLatestPublications, threatWatchlist, etc.
+  - Alerts API: alertsServiceSearch with CQL (used for customer telemetry).
   It does NOT support the by-vertical aggregate queries (threatIntelByVertical,
-  mdrBenchmarksByVertical) — those live on the standard api.taegis.secureworks.com.
+  mdrBenchmarksByVertical) or tenant-level summary queries (tenantAlertSummary,
+  coverageGaps, mdrActivity) — those live on standard api.taegis.secureworks.com.
 
 Official references:
   https://docs.taegis.secureworks.com/apis/using_threat_intelligence_api/
@@ -143,6 +145,21 @@ query TenantTelemetry($tenantId: ID!, $lookbackDays: Int!) {
 }
 """
 
+_CTPX_ALERTS_QUERY = """
+query AlertsSearch($in: SearchRequestInput!) {
+  alertsServiceSearch(in: $in) {
+    status
+    alerts {
+      total_results
+      list {
+        id
+        metadata { severity title }
+      }
+    }
+  }
+}
+"""
+
 
 # ── CTPX real CTU threat intel ───────────────────────────────────────────────
 
@@ -207,6 +224,56 @@ def _get_ctpx_industry_intel(vertical: str, token: str, base: str) -> Dict[str, 
     }
 
 
+# ── CTPX customer telemetry via alertsServiceSearch ──────────────────────────
+
+def _get_ctpx_customer_telemetry(tenant_id: str, token: str, base: str) -> Dict[str, Any]:
+    """
+    Fetch real alert data from CTPX using alertsServiceSearch (CQL).
+    Returns a telemetry dict shaped like the standard tenant query output.
+    """
+    raw = _gql(
+        _CTPX_ALERTS_QUERY,
+        {"in": {"cql_query": f"FROM alert EARLIEST=-{_LOOKBACK_DAYS}d", "offset": 0, "limit": 50}},
+        token, base,
+    )
+    resp = (raw.get("data") or {}).get("alertsServiceSearch") or {}
+    alerts_data = resp.get("alerts") or {}
+    total = alerts_data.get("total_results") or 0
+    alert_list = alerts_data.get("list") or []
+
+    high_sev = sum(
+        1 for a in alert_list
+        if (a.get("metadata") or {}).get("severity", 0) >= 0.6
+    )
+
+    title_counts: Dict[str, int] = {}
+    for a in alert_list:
+        title = (a.get("metadata") or {}).get("title") or "Unknown"
+        title_counts[title] = title_counts.get(title, 0) + 1
+    top_categories = sorted(title_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+
+    log.info(
+        "CTPX alerts for tenant %s: %d total, %d high-severity (from %d sampled).",
+        tenant_id, total, high_sev, len(alert_list),
+    )
+
+    return {
+        "tenant_id": tenant_id,
+        "lookback_days": _LOOKBACK_DAYS,
+        "total_alerts": total,
+        "high_severity_alerts": high_sev,
+        "avg_mttd_hours": 0.0,
+        "avg_mttr_hours": 0.0,
+        "industry_avg_mttr_hours": 0.0,
+        "top_threat_categories": [
+            {"name": t, "count": c, "severity": "mixed"} for t, c in top_categories
+        ],
+        "coverage_gaps": [],
+        "mdr_activity": {},
+        "ctpx_alerts_data": True,
+    }
+
+
 # ── public API ───────────────────────────────────────────────────────────────
 
 def get_industry_intel(vertical: str) -> Optional[Dict[str, Any]]:
@@ -260,8 +327,10 @@ def get_industry_intel(vertical: str) -> Optional[Dict[str, Any]]:
 def get_customer_telemetry(tenant_id: str) -> Optional[Dict[str, Any]]:
     """
     Fetch alert summary, coverage gaps, and MDR activity for a tenant (customer mode).
-    On CTPX, tenant-level aggregate queries are not available; returns None so Claude
-    uses the opp data + CTU publications instead.
+
+    - Standard Taegis: uses tenantAlertSummary, coverageGaps, mdrActivity.
+    - CTPX: uses alertsServiceSearch with CQL (those aggregate queries are unavailable).
+
     Returns None when credentials are absent or requests fail.
     """
     if not _has_creds():
@@ -270,8 +339,8 @@ def get_customer_telemetry(tenant_id: str) -> Optional[Dict[str, Any]]:
     try:
         token, base = _get_token()
         if _is_ctpx(base):
-            log.info("CTPX detected — tenant-level telemetry not available; skipping.")
-            return None
+            log.info("CTPX detected — using alertsServiceSearch for tenant %s.", tenant_id)
+            return _get_ctpx_customer_telemetry(tenant_id, token, base)
 
         raw = _gql(_TENANT_QUERY, {"tenantId": tenant_id, "lookbackDays": _LOOKBACK_DAYS}, token, base)
         root = raw.get("data") or {}

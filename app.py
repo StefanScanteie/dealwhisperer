@@ -97,6 +97,9 @@ def generate():
     if is_customer:
         tenant_id = opp.get("taegis_tenant_id") or "unknown"
         taegis_data = get_customer_telemetry(tenant_id)
+        if taegis_data is None:
+            log.info("Customer telemetry unavailable — falling back to industry intel.")
+            taegis_data = get_industry_intel(opp.get("industry") or "Healthcare")
     else:
         taegis_data = get_industry_intel(opp.get("industry") or "Healthcare")
 
