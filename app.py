@@ -99,7 +99,14 @@ def generate():
         osint_data = get_osint_intel(company_name, opp.get("industry") or "")
 
     # 4 — Synthesise
-    brief = generate_brief(opp, taegis_data, osint_data, is_customer=is_customer)
+    language = (body.get("language") or "en").strip().lower()
+    if language not in ("en", "ja"):
+        language = "en"
+    brief = generate_brief(
+        opp, taegis_data, osint_data,
+        is_customer=is_customer,
+        language=language,
+    )
     brief["no_access_sources"] = _no_access_list(
         taegis_data, osint_data, brief, is_customer=is_customer,
     )
@@ -137,7 +144,10 @@ def quick_brief():
         "technical_win_criteria": (body.get("pain") or "").strip(),
     }
 
-    brief = generate_brief(opp, None, None, is_customer=False)
+    language = (body.get("language") or "en").strip().lower()
+    if language not in ("en", "ja"):
+        language = "en"
+    brief = generate_brief(opp, None, None, is_customer=False, language=language)
     brief["no_access_sources"] = _no_access_list(None, None, brief, is_customer=False)
     return jsonify(brief)
 

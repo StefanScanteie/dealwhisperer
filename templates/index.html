@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Taegis Deal Whisperer</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -91,6 +92,31 @@
       background: var(--sophos-blue-light);
       color: var(--sophos-blue);
       border: 1px solid rgba(0, 91, 200, 0.2);
+    }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .lang-selector {
+      display: flex;
+      gap: 2px;
+      background: var(--gray-100);
+      padding: 2px;
+      border-radius: var(--radius);
+    }
+    .lang-selector button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--gray-500);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .lang-selector button:hover { color: var(--gray-700); }
+    .lang-selector button.active {
+      background: var(--white);
+      color: var(--sophos-blue);
+      box-shadow: var(--shadow);
     }
     .main {
       display: flex;
@@ -506,42 +532,48 @@
         <span class="logo-text">Taegis Deal Whisperer</span>
       </div>
     </div>
-    <div class="api-pills" id="apiPills">
-      <span class="pill" data-api="anthropic">Claude</span>
-      <span class="pill" data-api="vivun">Vivun</span>
-      <span class="pill" data-api="taegis">Taegis</span>
-      <span class="pill" data-api="serper">OSINT</span>
+    <div class="header-right">
+      <div class="api-pills" id="apiPills">
+        <span class="pill" data-api="anthropic">Claude</span>
+        <span class="pill" data-api="vivun">Vivun</span>
+        <span class="pill" data-api="taegis">Taegis</span>
+        <span class="pill" data-api="serper">OSINT</span>
+      </div>
+      <div class="lang-selector" id="langSelector">
+        <button type="button" class="active" data-lang="en" aria-label="English">EN</button>
+        <button type="button" data-lang="ja" aria-label="Japanese">JA</button>
+      </div>
     </div>
   </header>
   <div class="main">
     <aside class="left">
-      <span class="left-label">Generate brief</span>
+      <span class="left-label" data-i18n="left_label">Generate brief</span>
       <div class="tabs">
-        <button type="button" class="tab active" data-tab="vivun">Vivun opportunity</button>
-        <button type="button" class="tab" data-tab="manual">Manual input</button>
+        <button type="button" class="tab active" data-tab="vivun" data-i18n="tab_vivun">Vivun opportunity</button>
+        <button type="button" class="tab" data-tab="manual" data-i18n="tab_manual">Manual input</button>
       </div>
       <div id="panelVivun" class="panel active">
-        <input type="text" id="oppName" placeholder="e.g. Smiths Cogwheels" />
-        <button type="button" class="btn-generate" id="btnGenerate">Generate brief</button>
+        <input type="text" id="oppName" data-i18n-placeholder="placeholder_opp" placeholder="e.g. Smiths Cogwheels" />
+        <button type="button" class="btn-generate" id="btnGenerate" data-i18n="btn_generate">Generate brief</button>
       </div>
       <div id="panelManual" class="panel">
-        <input type="text" id="manualCompany" placeholder="Company name" />
-        <input type="text" id="manualIndustry" placeholder="Industry" />
-        <input type="text" id="manualStage" placeholder="Stage" />
-        <input type="text" id="manualCompetitor" placeholder="Competitor" />
-        <input type="text" id="manualPain" placeholder="Pain / win criteria" />
-        <textarea id="manualNotes" placeholder="Notes"></textarea>
-        <button type="button" class="btn-generate" id="btnManualGenerate">Generate brief</button>
+        <input type="text" id="manualCompany" data-i18n-placeholder="placeholder_company" placeholder="Company name" />
+        <input type="text" id="manualIndustry" data-i18n-placeholder="placeholder_industry" placeholder="Industry" />
+        <input type="text" id="manualStage" data-i18n-placeholder="placeholder_stage" placeholder="Stage" />
+        <input type="text" id="manualCompetitor" data-i18n-placeholder="placeholder_competitor" placeholder="Competitor" />
+        <input type="text" id="manualPain" data-i18n-placeholder="placeholder_pain" placeholder="Pain / win criteria" />
+        <textarea id="manualNotes" data-i18n-placeholder="placeholder_notes" placeholder="Notes"></textarea>
+        <button type="button" class="btn-generate" id="btnManualGenerate" data-i18n="btn_generate">Generate brief</button>
       </div>
       <div class="status-bar" id="statusBar"></div>
       <div class="quick-actions" id="quickActions">
-        <button type="button" id="btnExportPDF" title="Opens print dialog; choose 'Save as PDF' to export.">Export PDF</button>
+        <button type="button" id="btnExportPDF" data-i18n="btn_export_pdf" data-i18n-title="title_export_pdf" title="Opens print dialog; choose 'Save as PDF' to export.">Export PDF</button>
       </div>
     </aside>
     <section class="right">
       <div class="empty-state" id="emptyState">
         <img src="/static/empty-state-icon.png" alt="" style="width:94px; height:auto; margin-bottom:24px;">
-        <p>Enter an opportunity name to generate a personalized pre-call battle card.</p>
+        <p data-i18n="empty_state_p">Enter an opportunity name to generate a personalized pre-call battle card.</p>
       </div>
       <div class="brief-card" id="briefCard">
         <div class="brief-header">
@@ -554,88 +586,222 @@
         <div class="roi-hook" id="briefRoiHook"></div>
 
         <div class="section" id="sectionSnapshot">
-          <div class="section-title">Deal snapshot</div>
+          <div class="section-title" data-i18n="section_snapshot">Deal snapshot</div>
           <div class="section-body" id="briefSnapshot"></div>
         </div>
 
         <div class="section competitive-section" id="sectionCompetitive">
-          <div class="section-title">Competitive angle</div>
+          <div class="section-title" data-i18n="section_competitive">Competitive angle</div>
           <div class="section-body" id="briefCompetitive"></div>
         </div>
 
         <div class="section" id="sectionIndustryProof">
-          <div class="section-title">Industry proof point</div>
+          <div class="section-title" data-i18n="section_industry_proof">Industry proof point</div>
           <div class="section-body" id="briefIndustryProof"></div>
         </div>
 
         <div class="section" id="sectionObjections">
-          <div class="section-title">Objections &amp; rebuttals</div>
+          <div class="section-title" data-i18n="section_objections">Objections &amp; rebuttals</div>
           <div id="briefObjections"></div>
         </div>
 
         <div class="section" id="sectionWinMap">
-          <div class="section-title">Technical win criteria map</div>
+          <div class="section-title" data-i18n="section_win_map">Technical win criteria map</div>
           <div id="briefWinMap"></div>
         </div>
 
         <div class="section" id="sectionDemoFlow">
-          <div class="section-title">Demo flow</div>
+          <div class="section-title" data-i18n="section_demo_flow">Demo flow</div>
           <div id="briefDemoFlow"></div>
         </div>
 
         <div class="section osint-section" id="sectionOsint">
-          <div class="section-title">OSINT &amp; conversation hook</div>
+          <div class="section-title" data-i18n="section_osint">OSINT &amp; conversation hook</div>
           <div class="section-body" id="briefOsint"></div>
         </div>
 
         <div class="section stakeholder-section" id="sectionStakeholders">
-          <div class="section-title">Key stakeholders</div>
+          <div class="section-title" data-i18n="section_stakeholders">Key stakeholders</div>
           <div id="briefStakeholders"></div>
         </div>
 
         <div class="section risk-section" id="sectionRisks">
-          <div class="section-title">Risk factors &amp; mitigations</div>
+          <div class="section-title" data-i18n="section_risks">Risk factors &amp; mitigations</div>
           <div id="briefRisks"></div>
         </div>
 
         <div class="section" id="sectionCallObjectives">
-          <div class="section-title">Call objectives</div>
+          <div class="section-title" data-i18n="section_call_objectives">Call objectives</div>
           <div class="section-body" id="briefCallObjectives"></div>
         </div>
 
         <div class="section" id="sectionDiscovery">
-          <div class="section-title">Discovery questions</div>
+          <div class="section-title" data-i18n="section_discovery">Discovery questions</div>
           <div class="section-body" id="briefDiscovery"></div>
         </div>
 
         <div class="section" id="sectionActionItems">
-          <div class="section-title">Open action items</div>
+          <div class="section-title" data-i18n="section_action_items">Open action items</div>
           <div class="section-body" id="briefActionItems"></div>
         </div>
 
         <div class="section email-section" id="sectionEmail">
-          <div class="section-title">Follow-up email draft</div>
+          <div class="section-title" data-i18n="section_email">Follow-up email draft</div>
           <div class="email-body" id="briefEmail"></div>
         </div>
 
         <div class="section" id="sectionExpansion">
-          <div class="section-title">Expansion opportunity</div>
+          <div class="section-title" data-i18n="section_expansion">Expansion opportunity</div>
           <div class="section-body expansion-block" id="briefExpansion"></div>
         </div>
 
         <div class="section" id="sectionRenewal">
-          <div class="section-title">Renewal defense</div>
+          <div class="section-title" data-i18n="section_renewal">Renewal defense</div>
           <div class="section-body" id="briefRenewal"></div>
         </div>
 
         <div class="section" id="sectionQbr">
-          <div class="section-title">QBR headline stats</div>
+          <div class="section-title" data-i18n="section_qbr">QBR headline stats</div>
           <ul class="qbr-stats" id="briefQbr"></ul>
         </div>
       </div>
     </section>
   </div>
   <script>
+    var LANG_STORAGE_KEY = 'deal_whisperer_lang';
+
+    var I18N = {
+      en: {
+        left_label: 'Generate brief',
+        tab_vivun: 'Vivun opportunity',
+        tab_manual: 'Manual input',
+        placeholder_opp: 'e.g. Smiths Cogwheels',
+        placeholder_company: 'Company name',
+        placeholder_industry: 'Industry',
+        placeholder_stage: 'Stage',
+        placeholder_competitor: 'Competitor',
+        placeholder_pain: 'Pain / win criteria',
+        placeholder_notes: 'Notes',
+        btn_generate: 'Generate brief',
+        btn_export_pdf: 'Export PDF',
+        title_export_pdf: 'Opens print dialog; choose "Save as PDF" to export.',
+        empty_state_p: 'Enter an opportunity name to generate a personalized pre-call battle card.',
+        section_snapshot: 'Deal snapshot',
+        section_competitive: 'Competitive angle',
+        section_industry_proof: 'Industry proof point',
+        section_objections: 'Objections & rebuttals',
+        section_win_map: 'Technical win criteria map',
+        section_demo_flow: 'Demo flow',
+        section_osint: 'OSINT & conversation hook',
+        section_stakeholders: 'Key stakeholders',
+        section_risks: 'Risk factors & mitigations',
+        section_call_objectives: 'Call objectives',
+        section_discovery: 'Discovery questions',
+        section_action_items: 'Open action items',
+        section_email: 'Follow-up email draft',
+        section_expansion: 'Expansion opportunity',
+        section_renewal: 'Renewal defense',
+        section_qbr: 'QBR headline stats',
+        status_enter_opp: 'Enter an opportunity name.',
+        status_enter_company: 'Enter company name.',
+        status_generating: 'Generating…',
+        status_ready: 'Brief ready.',
+        status_error_prefix: 'Error: ',
+        no_access_prefix: 'No access:',
+        badge_customer: 'Customer',
+        badge_prospect: 'Prospect',
+        th_name: 'Name',
+        th_location: 'Location',
+        th_relevance: 'Relevance',
+        osint_insight_label: 'OSINT insight:',
+        conversation_hook_label: 'Conversation hook:',
+        mitigation_label: 'Mitigation:',
+        expansion_surface: 'Surface:',
+        expansion_risk: 'Risk:',
+        expansion_product: 'Product:'
+      },
+      ja: {
+        left_label: 'ブリーフを生成',
+        tab_vivun: 'Vivun案件',
+        tab_manual: '手動入力',
+        placeholder_opp: '例: Smiths Cogwheels',
+        placeholder_company: '会社名',
+        placeholder_industry: '業種',
+        placeholder_stage: 'ステージ',
+        placeholder_competitor: '競合',
+        placeholder_pain: '課題・受注基準',
+        placeholder_notes: 'メモ',
+        btn_generate: 'ブリーフを生成',
+        btn_export_pdf: 'PDF出力',
+        title_export_pdf: '印刷ダイアログで「PDFとして保存」を選択して出力します。',
+        empty_state_p: '案件名を入力すると、コール前用のバトルカードが生成されます。',
+        section_snapshot: '取引スナップショット',
+        section_competitive: '競合優位性',
+        section_industry_proof: '業界実績',
+        section_objections: '反論とリバタル',
+        section_win_map: '技術受注基準マップ',
+        section_demo_flow: 'デモの流れ',
+        section_osint: 'OSINT・会話のフック',
+        section_stakeholders: '主要ステークホルダー',
+        section_risks: 'リスクと対策',
+        section_call_objectives: 'コールの目的',
+        section_discovery: 'ディスカバリー質問',
+        section_action_items: '未対応アクション',
+        section_email: 'フォローアップメール案',
+        section_expansion: '拡販の機会',
+        section_renewal: '更新防御',
+        section_qbr: 'QBRハイライト',
+        status_enter_opp: '案件名を入力してください。',
+        status_enter_company: '会社名を入力してください。',
+        status_generating: '生成中…',
+        status_ready: 'ブリーフの準備ができました。',
+        status_error_prefix: 'エラー: ',
+        no_access_prefix: 'アクセス不可:',
+        badge_customer: '顧客',
+        badge_prospect: '見込み',
+        th_name: '名前',
+        th_location: '拠点',
+        th_relevance: '関連',
+        osint_insight_label: 'OSINTインサイト:',
+        conversation_hook_label: '会話のフック:',
+        mitigation_label: '対策:',
+        expansion_surface: '対象:',
+        expansion_risk: 'リスク:',
+        expansion_product: '製品:'
+      }
+    };
+
+    function getCurrentLang() {
+      var stored = localStorage.getItem(LANG_STORAGE_KEY);
+      return (stored === 'ja' || stored === 'en') ? stored : 'en';
+    }
+
+    function setCurrentLang(lang) {
+      if (lang !== 'en' && lang !== 'ja') return;
+      localStorage.setItem(LANG_STORAGE_KEY, lang);
+      applyLanguage(lang);
+    }
+
+    function applyLanguage(lang) {
+      var t = I18N[lang] || I18N.en;
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (key && t[key] !== undefined) el.textContent = t[key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n-placeholder');
+        if (key && t[key] !== undefined) el.placeholder = t[key];
+      });
+      document.querySelectorAll('[data-i18n-title]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n-title');
+        if (key && t[key] !== undefined) el.title = t[key];
+      });
+      document.querySelectorAll('.lang-selector button').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+      });
+    }
+
     function esc(str) {
       if (str == null || str === undefined) return '';
       var div = document.createElement('div');
@@ -689,8 +855,9 @@
       var isProspect = mode === 'prospect';
       var isCustomer = mode === 'customer';
       var mood = brief.deal_mood || '';
+      var t = I18N[getCurrentLang()] || I18N.en;
       var badgesHtml = '<span class="badge mode-' + esc(mode) + '">'
-        + (isCustomer ? 'Customer' : 'Prospect') + '</span>';
+        + (isCustomer ? t.badge_customer : t.badge_prospect) + '</span>';
       if (mood) badgesHtml += '<span class="badge mood">' + esc(mood) + '</span>';
       document.getElementById('briefBadges').innerHTML = badgesHtml;
 
@@ -703,7 +870,7 @@
       var bannerEl = document.getElementById('noAccessBanner');
       if (noAccess.length) {
         bannerEl.style.display = 'block';
-        bannerEl.innerHTML = '<strong>No access:</strong> ' + noAccess.join(', ');
+        bannerEl.innerHTML = '<strong>' + esc(t.no_access_prefix) + '</strong> ' + noAccess.join(', ');
       } else {
         bannerEl.style.display = 'none';
         bannerEl.innerHTML = '';
@@ -747,8 +914,8 @@
       var hasOsint = isProspect && (brief.osint_insight || brief.conversation_hook);
       show('sectionOsint', hasOsint);
       var osintHtml = '';
-      if (brief.osint_insight) osintHtml += '<p style="margin:0 0 12px 0"><strong>OSINT insight:</strong> ' + esc(brief.osint_insight) + '</p>';
-      if (brief.conversation_hook) osintHtml += '<p style="margin:0"><strong>Conversation hook:</strong> ' + esc(brief.conversation_hook) + '</p>';
+      if (brief.osint_insight) osintHtml += '<p style="margin:0 0 12px 0"><strong>' + esc(t.osint_insight_label) + '</strong> ' + esc(brief.osint_insight) + '</p>';
+      if (brief.conversation_hook) osintHtml += '<p style="margin:0"><strong>' + esc(t.conversation_hook_label) + '</strong> ' + esc(brief.conversation_hook) + '</p>';
       document.getElementById('briefOsint').innerHTML = osintHtml || '\u2014';
 
       var stakeholders = brief.key_stakeholders || [];
@@ -756,7 +923,7 @@
       if (stakeholders.length) {
         document.getElementById('briefStakeholders').innerHTML =
           '<table class="stakeholder-table"><thead><tr>'
-          + '<th>Name</th><th>Location</th><th>Relevance</th>'
+          + '<th>' + esc(t.th_name) + '</th><th>' + esc(t.th_location) + '</th><th>' + esc(t.th_relevance) + '</th>'
           + '</tr></thead><tbody>'
           + stakeholders.map(function(s) {
             return '<tr><td>' + esc(s.name) + '</td><td>' + esc(s.location)
@@ -769,7 +936,7 @@
       show('sectionRisks', risks.length > 0);
       document.getElementById('briefRisks').innerHTML = risks.map(function(r) {
         return '<div class="risk-card"><div class="risk-label">' + esc(r.risk)
-          + '</div><div class="mitigation"><strong>Mitigation:</strong> '
+          + '</div><div class="mitigation"><strong>' + esc(t.mitigation_label) + '</strong> '
           + esc(r.mitigation) + '</div></div>';
       }).join('');
 
@@ -797,9 +964,9 @@
       show('sectionExpansion', expansion && isCustomer);
       if (expansion && typeof expansion === 'object') {
         document.getElementById('briefExpansion').innerHTML =
-          '<p><strong>Surface:</strong> ' + esc(expansion.surface) + '</p>' +
-          '<p><strong>Risk:</strong> ' + esc(expansion.risk) + '</p>' +
-          '<p><strong>Product:</strong> ' + esc(expansion.product) + '</p>';
+          '<p><strong>' + esc(t.expansion_surface) + '</strong> ' + esc(expansion.surface) + '</p>' +
+          '<p><strong>' + esc(t.expansion_risk) + '</strong> ' + esc(expansion.risk) + '</p>' +
+          '<p><strong>' + esc(t.expansion_product) + '</strong> ' + esc(expansion.product) + '</p>';
       } else {
         document.getElementById('briefExpansion').textContent = expansion || '\u2014';
       }
@@ -817,27 +984,29 @@
 
     function generate() {
       var oppName = document.getElementById('oppName').value.trim();
-      if (!oppName) { setStatus('Enter an opportunity name.', 'error'); return; }
-      setStatus('Generating\u2026', 'loading');
+      var t = I18N[getCurrentLang()] || I18N.en;
+      if (!oppName) { setStatus(t.status_enter_opp, 'error'); return; }
+      setStatus(t.status_generating, 'loading');
       document.getElementById('btnGenerate').disabled = true;
       fetch('/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ opp_name: oppName })
+        body: JSON.stringify({ opp_name: oppName, language: getCurrentLang() })
       })
         .then(function(r) {
           if (!r.ok) return r.json().then(function(j) { throw new Error(j.error || r.statusText); });
           return r.json();
         })
-        .then(function(brief) { renderBrief(brief); setStatus('Brief ready.', 'success'); })
-        .catch(function(err) { setStatus('Error: ' + err.message, 'error'); })
+        .then(function(brief) { renderBrief(brief); setStatus(t.status_ready, 'success'); })
+        .catch(function(err) { setStatus(t.status_error_prefix + err.message, 'error'); })
         .finally(function() { document.getElementById('btnGenerate').disabled = false; });
     }
 
     function generateManual() {
       var company = document.getElementById('manualCompany').value.trim();
-      if (!company) { setStatus('Enter company name.', 'error'); return; }
-      setStatus('Generating\u2026', 'loading');
+      var t = I18N[getCurrentLang()] || I18N.en;
+      if (!company) { setStatus(t.status_enter_company, 'error'); return; }
+      setStatus(t.status_generating, 'loading');
       document.getElementById('btnManualGenerate').disabled = true;
       fetch('/quick-brief', {
         method: 'POST',
@@ -848,20 +1017,28 @@
           stage: document.getElementById('manualStage').value.trim(),
           competitor: document.getElementById('manualCompetitor').value.trim(),
           pain: document.getElementById('manualPain').value.trim(),
-          notes: document.getElementById('manualNotes').value.trim()
+          notes: document.getElementById('manualNotes').value.trim(),
+          language: getCurrentLang()
         })
       })
         .then(function(r) {
           if (!r.ok) return r.json().then(function(j) { throw new Error(j.error || r.statusText); });
           return r.json();
         })
-        .then(function(brief) { renderBrief(brief); setStatus('Brief ready.', 'success'); })
-        .catch(function(err) { setStatus('Error: ' + err.message, 'error'); })
+        .then(function(brief) { renderBrief(brief); setStatus(t.status_ready, 'success'); })
+        .catch(function(err) { setStatus(t.status_error_prefix + err.message, 'error'); })
         .finally(function() { document.getElementById('btnManualGenerate').disabled = false; });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+      applyLanguage(getCurrentLang());
       checkHealth();
+      document.querySelectorAll('.lang-selector button').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var lang = this.getAttribute('data-lang');
+          if (lang) setCurrentLang(lang);
+        });
+      });
       document.querySelectorAll('.tab').forEach(function(t) {
         t.addEventListener('click', function() {
           document.querySelectorAll('.tab').forEach(function(x) { x.classList.remove('active'); });

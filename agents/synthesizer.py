@@ -400,6 +400,7 @@ def _build_instruction(
     output_schema: Dict[str, str],
     edr_landscape: list,
     taegis_context: Dict[str, Any],
+    language: str = "en",
 ) -> str:
     parts = [
         "Return ONLY a single JSON object. No markdown, no code fence, no explanation. "
@@ -413,6 +414,13 @@ def _build_instruction(
         "Use the se_notes, business_challenges, edr_landscape, company_profile, and "
         "technical_win_criteria fields in opp to make every section specific — avoid generic advice."
     ]
+    if language == "ja":
+        parts.append(
+            "Write all string values in this JSON in Japanese (e.g. deal_snapshot, roi_hook, "
+            "objections, demo_flow talking_points, conversation_hook, follow_up_email, etc.)."
+        )
+    else:
+        parts.append("Write all string values in this JSON in English.")
 
     if edr_landscape:
         tools = ", ".join(sorted({e.get("edr", "") for e in edr_landscape if e.get("edr")}))
@@ -447,11 +455,16 @@ def generate_brief(
     osint_data: Optional[Dict[str, Any]] = None,
     *,
     is_customer: bool = False,
+    language: str = "en",
 ) -> Dict[str, Any]:
     """
     Produce a battle-card brief.  Uses Claude when ANTHROPIC_API_KEY is
     available; falls back to a deterministic minimal brief otherwise.
+    language: "en" or "ja" — all narrative string fields in the brief are in that language.
     """
+    if language not in ("en", "ja"):
+        language = "en"
+
     if not os.getenv("ANTHROPIC_API_KEY"):
         brief = (
             _customer_brief(opp, taegis_data)
@@ -464,12 +477,15 @@ def generate_brief(
     output_schema = _build_output_schema(is_customer)
     taegis_context = taegis_data or {}
     edr_landscape = (opp or {}).get("edr_landscape") or []
-    instruction = _build_instruction(output_schema, edr_landscape, taegis_context)
+    instruction = _build_instruction(
+        output_schema, edr_landscape, taegis_context, language=language
+    )
 
     payload = {
         "instruction": instruction,
         "output_schema": output_schema,
         "mode": "customer" if is_customer else "prospect",
+        "output_language": language,
         "opp": opp,
         "taegis_data": taegis_context,
     }
