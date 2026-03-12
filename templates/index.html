@@ -95,27 +95,40 @@
       border: 1px solid rgba(21, 128, 61, 0.2);
     }
     .header-right { display: flex; align-items: center; gap: 16px; }
-    .lang-selector {
-      display: flex;
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid var(--gray-200);
+    .lang-selector { position: relative; user-select: none; }
+    .lang-toggle {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 10px; border-radius: 20px;
+      border: 1px solid var(--gray-200); background: #fff;
+      font-size: 0.8125rem; font-weight: 500; color: var(--gray-800);
+      cursor: pointer; white-space: nowrap;
+      width: 136px; box-sizing: border-box;
     }
-    .lang-selector button {
-      padding: 6px 12px;
-      border: none;
-      font-size: 0.75rem;
-      font-weight: 500;
-      background: #fde8e8;
-      color: #b91c1c;
-      cursor: pointer;
-      font-family: inherit;
+    .lang-toggle .lang-label {
+      flex: 1; text-align: left;
     }
-    .lang-selector button:hover { opacity: 0.8; }
-    .lang-selector button.active {
-      background: #dcfce7;
-      color: #15803d;
+    .lang-toggle:hover { border-color: var(--gray-400); }
+    .lang-toggle .caret {
+      display: inline-block; width: 0; height: 0;
+      border-left: 4px solid transparent; border-right: 4px solid transparent;
+      border-top: 5px solid #666; transition: transform 0.2s;
     }
+    .lang-selector.open .lang-toggle .caret { transform: rotate(180deg); }
+    .lang-menu {
+      display: none; position: absolute; top: calc(100% + 4px); right: 0;
+      background: #fff; border: 1px solid var(--gray-200);
+      border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      z-index: 1000; min-width: 160px; padding: 4px 0;
+      list-style: none; margin: 0;
+    }
+    .lang-selector.open .lang-menu { display: block; }
+    .lang-menu li {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; font-size: 0.8125rem; font-weight: 500;
+      color: var(--gray-800); cursor: pointer; white-space: nowrap;
+    }
+    .lang-menu li:hover { background: var(--gray-50); }
+    .lang-menu li.active { background: #dcfce7; color: #15803d; }
     .main {
       display: flex;
       flex: 1;
@@ -576,8 +589,18 @@
         <span class="pill" data-api="serper">OSINT</span>
       </div>
       <div class="lang-selector" id="langSelector">
-        <button type="button" class="active" data-lang="en" aria-label="English">EN</button>
-        <button type="button" data-lang="ja" aria-label="Japanese">JA</button>
+        <div class="lang-toggle" tabindex="0" aria-label="Language">
+          <span class="lang-flag">&#127468;&#127463;</span>
+          <span class="lang-label">English</span>
+          <span class="caret"></span>
+        </div>
+        <ul class="lang-menu">
+          <li data-lang="en" data-flag="&#127468;&#127463;" data-name="English">&#127468;&#127463; English</li>
+          <li data-lang="ja" data-flag="&#127471;&#127477;" data-name="日本語">&#127471;&#127477; 日本語</li>
+          <li data-lang="zh" data-flag="&#127464;&#127475;" data-name="中文">&#127464;&#127475; 中文</li>
+          <li data-lang="th" data-flag="&#127481;&#127469;" data-name="ไทย">&#127481;&#127469; ไทย</li>
+          <li data-lang="vi" data-flag="&#127483;&#127475;" data-name="Tiếng Việt">&#127483;&#127475; Tiếng Việt</li>
+        </ul>
       </div>
     </div>
   </header>
@@ -785,7 +808,8 @@
         expansion_product: 'Product:',
         taegis_override_label: 'Taegis overrides (optional)',
         placeholder_tenant_id: 'Tenant ID',
-        region_auto: 'Auto'
+        region_auto: 'Auto',
+        demo_min: 'min'
       },
       ja: {
         left_label: 'ブリーフを生成',
@@ -837,17 +861,178 @@
         expansion_product: '製品:',
         taegis_override_label: 'Taegisオーバーライド（任意）',
         placeholder_tenant_id: 'テナントID',
-        region_auto: '自動'
+        region_auto: '自動',
+        demo_min: '分'
+      },
+      zh: {
+        left_label: '生成简报',
+        tab_vivun: 'Vivun 商机',
+        tab_manual: '手动输入',
+        placeholder_opp: '例：Smiths Cogwheels',
+        placeholder_company: '公司名称',
+        placeholder_industry: '行业',
+        placeholder_stage: '阶段',
+        placeholder_competitor: '竞争对手',
+        placeholder_pain: '痛点/关键标准',
+        placeholder_notes: '备注',
+        btn_generate: '生成简报',
+        btn_export_pdf: '导出 PDF',
+        title_export_pdf: '打开打印对话框，选择"另存为 PDF"导出。',
+        empty_state_p: '输入商机名称，生成个性化的通话前战斗卡。',
+        section_snapshot: '交易概览',
+        section_competitive: '竞争优势',
+        section_industry_proof: '行业案例',
+        section_objections: '异议与应对',
+        section_win_map: '技术赢单标准',
+        section_demo_flow: '演示流程',
+        section_osint: 'OSINT 与对话切入点',
+        section_stakeholders: '关键利益相关者',
+        section_risks: '风险与对策',
+        section_call_objectives: '通话目标',
+        section_discovery: '发现问题',
+        section_action_items: '待办事项',
+        section_email: '后续邮件草稿',
+        section_expansion: '扩展机会',
+        section_renewal: '续约防御',
+        section_qbr: 'QBR 关键指标',
+        status_enter_opp: '请输入商机名称。',
+        status_enter_company: '请输入公司名称。',
+        status_generating: '生成中…',
+        status_ready: '简报已就绪。',
+        status_error_prefix: '错误：',
+        no_access_prefix: '无权访问：',
+        badge_customer: '客户',
+        badge_prospect: '潜在客户',
+        th_name: '姓名',
+        th_location: '地点',
+        th_relevance: '相关性',
+        osint_insight_label: 'OSINT 洞察：',
+        conversation_hook_label: '对话切入点：',
+        mitigation_label: '对策：',
+        expansion_surface: '对象：',
+        expansion_risk: '风险：',
+        expansion_product: '产品：',
+        taegis_override_label: 'Taegis 覆盖（可选）',
+        placeholder_tenant_id: '租户 ID',
+        region_auto: '自动',
+        demo_min: '分钟'
+      },
+      th: {
+        left_label: 'สร้างบรีฟ',
+        tab_vivun: 'Vivun โอกาส',
+        tab_manual: 'กรอกข้อมูลเอง',
+        placeholder_opp: 'เช่น Smiths Cogwheels',
+        placeholder_company: 'ชื่อบริษัท',
+        placeholder_industry: 'อุตสาหกรรม',
+        placeholder_stage: 'ขั้นตอน',
+        placeholder_competitor: 'คู่แข่ง',
+        placeholder_pain: 'ปัญหา/เกณฑ์สำคัญ',
+        placeholder_notes: 'หมายเหตุ',
+        btn_generate: 'สร้างบรีฟ',
+        btn_export_pdf: 'ส่งออก PDF',
+        title_export_pdf: 'เปิดหน้าต่างพิมพ์ เลือก "บันทึกเป็น PDF" เพื่อส่งออก',
+        empty_state_p: 'ป้อนชื่อโอกาสเพื่อสร้างบัตรเตรียมตัวก่อนโทรเฉพาะบุคคล',
+        section_snapshot: 'ภาพรวมดีล',
+        section_competitive: 'จุดแข็งเชิงแข่งขัน',
+        section_industry_proof: 'กรณีศึกษาอุตสาหกรรม',
+        section_objections: 'ข้อโต้แย้งและการตอบกลับ',
+        section_win_map: 'เกณฑ์ชนะทางเทคนิค',
+        section_demo_flow: 'ลำดับการสาธิต',
+        section_osint: 'OSINT และจุดเริ่มบทสนทนา',
+        section_stakeholders: 'ผู้มีส่วนได้ส่วนเสียหลัก',
+        section_risks: 'ความเสี่ยงและแผนรับมือ',
+        section_call_objectives: 'เป้าหมายการโทร',
+        section_discovery: 'คำถามค้นหาความต้องการ',
+        section_action_items: 'รายการดำเนินการ',
+        section_email: 'ร่างอีเมลติดตาม',
+        section_expansion: 'โอกาสขยายธุรกิจ',
+        section_renewal: 'การป้องกันการต่อสัญญา',
+        section_qbr: 'ไฮไลท์ QBR',
+        status_enter_opp: 'กรุณาป้อนชื่อโอกาส',
+        status_enter_company: 'กรุณาป้อนชื่อบริษัท',
+        status_generating: 'กำลังสร้าง…',
+        status_ready: 'บรีฟพร้อมแล้ว',
+        status_error_prefix: 'ข้อผิดพลาด: ',
+        no_access_prefix: 'ไม่สามารถเข้าถึง:',
+        badge_customer: 'ลูกค้า',
+        badge_prospect: 'ผู้มุ่งหวัง',
+        th_name: 'ชื่อ',
+        th_location: 'สถานที่',
+        th_relevance: 'ความเกี่ยวข้อง',
+        osint_insight_label: 'OSINT ข้อมูลเชิงลึก:',
+        conversation_hook_label: 'จุดเริ่มบทสนทนา:',
+        mitigation_label: 'แผนรับมือ:',
+        expansion_surface: 'พื้นที่เป้าหมาย:',
+        expansion_risk: 'ความเสี่ยง:',
+        expansion_product: 'ผลิตภัณฑ์:',
+        taegis_override_label: 'Taegis แทนที่ (ไม่บังคับ)',
+        placeholder_tenant_id: 'Tenant ID',
+        region_auto: 'อัตโนมัติ',
+        demo_min: 'นาที'
+      },
+      vi: {
+        left_label: 'Tạo bản tóm tắt',
+        tab_vivun: 'Cơ hội Vivun',
+        tab_manual: 'Nhập thủ công',
+        placeholder_opp: 'VD: Smiths Cogwheels',
+        placeholder_company: 'Tên công ty',
+        placeholder_industry: 'Ngành',
+        placeholder_stage: 'Giai đoạn',
+        placeholder_competitor: 'Đối thủ',
+        placeholder_pain: 'Vấn đề/tiêu chí',
+        placeholder_notes: 'Ghi chú',
+        btn_generate: 'Tạo bản tóm tắt',
+        btn_export_pdf: 'Xuất PDF',
+        title_export_pdf: 'Mở hộp thoại in, chọn "Lưu dưới dạng PDF" để xuất.',
+        empty_state_p: 'Nhập tên cơ hội để tạo thẻ chiến đấu trước cuộc gọi.',
+        section_snapshot: 'Tổng quan giao dịch',
+        section_competitive: 'Lợi thế cạnh tranh',
+        section_industry_proof: 'Minh chứng ngành',
+        section_objections: 'Phản đối và phản biện',
+        section_win_map: 'Tiêu chí thắng kỹ thuật',
+        section_demo_flow: 'Quy trình demo',
+        section_osint: 'OSINT và điểm mở đầu',
+        section_stakeholders: 'Các bên liên quan chính',
+        section_risks: 'Rủi ro và giải pháp',
+        section_call_objectives: 'Mục tiêu cuộc gọi',
+        section_discovery: 'Câu hỏi khám phá',
+        section_action_items: 'Công việc cần làm',
+        section_email: 'Bản nháp email theo dõi',
+        section_expansion: 'Cơ hội mở rộng',
+        section_renewal: 'Bảo vệ gia hạn',
+        section_qbr: 'Chỉ số QBR nổi bật',
+        status_enter_opp: 'Vui lòng nhập tên cơ hội.',
+        status_enter_company: 'Vui lòng nhập tên công ty.',
+        status_generating: 'Đang tạo…',
+        status_ready: 'Bản tóm tắt đã sẵn sàng.',
+        status_error_prefix: 'Lỗi: ',
+        no_access_prefix: 'Không truy cập được:',
+        badge_customer: 'Khách hàng',
+        badge_prospect: 'Khách tiềm năng',
+        th_name: 'Tên',
+        th_location: 'Vị trí',
+        th_relevance: 'Liên quan',
+        osint_insight_label: 'Thông tin OSINT:',
+        conversation_hook_label: 'Điểm mở đầu:',
+        mitigation_label: 'Giải pháp:',
+        expansion_surface: 'Đối tượng:',
+        expansion_risk: 'Rủi ro:',
+        expansion_product: 'Sản phẩm:',
+        taegis_override_label: 'Taegis ghi đè (tùy chọn)',
+        placeholder_tenant_id: 'Tenant ID',
+        region_auto: 'Tự động',
+        demo_min: 'phút'
       }
     };
 
+    var SUPPORTED_LANGS = ['en', 'ja', 'zh', 'th', 'vi'];
     function getCurrentLang() {
       var stored = localStorage.getItem(LANG_STORAGE_KEY);
-      return (stored === 'ja' || stored === 'en') ? stored : 'en';
+      return SUPPORTED_LANGS.indexOf(stored) !== -1 ? stored : 'en';
     }
 
     function setCurrentLang(lang) {
-      if (lang !== 'en' && lang !== 'ja') return;
+      if (SUPPORTED_LANGS.indexOf(lang) === -1) return;
       localStorage.setItem(LANG_STORAGE_KEY, lang);
       applyLanguage(lang);
     }
@@ -867,9 +1052,15 @@
         var key = el.getAttribute('data-i18n-title');
         if (key && t[key] !== undefined) el.title = t[key];
       });
-      document.querySelectorAll('.lang-selector button').forEach(function(btn) {
-        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
-      });
+      var sel = document.getElementById('langSelector');
+      var active = sel.querySelector('li[data-lang="' + lang + '"]');
+      if (active) {
+        sel.querySelector('.lang-flag').textContent = active.getAttribute('data-flag');
+        sel.querySelector('.lang-label').textContent = active.getAttribute('data-name');
+        sel.querySelectorAll('li').forEach(function(li) {
+          li.classList.toggle('active', li.getAttribute('data-lang') === lang);
+        });
+      }
     }
 
     function esc(str) {
@@ -977,7 +1168,7 @@
       document.getElementById('briefDemoFlow').innerHTML = demoFlow.map(function(d, i) {
         return '<div class="demo-flow-item"><span class="screen">' + (i + 1)
           + '. ' + esc(d.screen) + '</span><span class="duration">('
-          + (d.duration_mins || 0) + ' min)</span><div class="talking">'
+          + (d.duration_mins || 0) + ' ' + esc(t.demo_min) + ')</span><div class="talking">'
           + esc(d.talking_point) + '</div></div>';
       }).join('');
 
@@ -1052,21 +1243,15 @@
       }).join('');
     }
 
-    function generate() {
-      var oppName = document.getElementById('oppName').value.trim();
+    function postBrief(url, payload, btnId) {
       var t = I18N[getCurrentLang()] || I18N.en;
-      if (!oppName) { setStatus(t.status_enter_opp, 'error'); return; }
       setStatus(t.status_generating, 'loading');
-      document.getElementById('btnGenerate').disabled = true;
-      fetch('/generate', {
+      document.getElementById(btnId).disabled = true;
+      payload.language = getCurrentLang();
+      fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          opp_name: oppName,
-          language: getCurrentLang(),
-          taegis_tenant_id: document.getElementById('overrideTenantId').value.trim() || undefined,
-          taegis_region: document.getElementById('overrideRegion').value || undefined
-        })
+        body: JSON.stringify(payload)
       })
         .then(function(r) {
           if (!r.ok) return r.json().then(function(j) { throw new Error(j.error || r.statusText); });
@@ -1074,47 +1259,51 @@
         })
         .then(function(brief) { renderBrief(brief); setStatus(t.status_ready, 'success'); })
         .catch(function(err) { setStatus(t.status_error_prefix + err.message, 'error'); })
-        .finally(function() { document.getElementById('btnGenerate').disabled = false; });
+        .finally(function() { document.getElementById(btnId).disabled = false; });
+    }
+
+    function generate() {
+      var oppName = document.getElementById('oppName').value.trim();
+      var t = I18N[getCurrentLang()] || I18N.en;
+      if (!oppName) { setStatus(t.status_enter_opp, 'error'); return; }
+      postBrief('/generate', {
+        opp_name: oppName,
+        taegis_tenant_id: document.getElementById('overrideTenantId').value.trim() || undefined,
+        taegis_region: document.getElementById('overrideRegion').value || undefined
+      }, 'btnGenerate');
     }
 
     function generateManual() {
       var company = document.getElementById('manualCompany').value.trim();
       var t = I18N[getCurrentLang()] || I18N.en;
       if (!company) { setStatus(t.status_enter_company, 'error'); return; }
-      setStatus(t.status_generating, 'loading');
-      document.getElementById('btnManualGenerate').disabled = true;
-      fetch('/quick-brief', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          company: company,
-          industry: document.getElementById('manualIndustry').value.trim(),
-          stage: document.getElementById('manualStage').value.trim(),
-          competitor: document.getElementById('manualCompetitor').value.trim(),
-          pain: document.getElementById('manualPain').value.trim(),
-          notes: document.getElementById('manualNotes').value.trim(),
-          language: getCurrentLang(),
-          taegis_tenant_id: document.getElementById('manualOverrideTenantId').value.trim() || undefined,
-          taegis_region: document.getElementById('manualOverrideRegion').value || undefined
-        })
-      })
-        .then(function(r) {
-          if (!r.ok) return r.json().then(function(j) { throw new Error(j.error || r.statusText); });
-          return r.json();
-        })
-        .then(function(brief) { renderBrief(brief); setStatus(t.status_ready, 'success'); })
-        .catch(function(err) { setStatus(t.status_error_prefix + err.message, 'error'); })
-        .finally(function() { document.getElementById('btnManualGenerate').disabled = false; });
+      postBrief('/quick-brief', {
+        company: company,
+        industry: document.getElementById('manualIndustry').value.trim(),
+        stage: document.getElementById('manualStage').value.trim(),
+        competitor: document.getElementById('manualCompetitor').value.trim(),
+        pain: document.getElementById('manualPain').value.trim(),
+        notes: document.getElementById('manualNotes').value.trim(),
+        taegis_tenant_id: document.getElementById('manualOverrideTenantId').value.trim() || undefined,
+        taegis_region: document.getElementById('manualOverrideRegion').value || undefined
+      }, 'btnManualGenerate');
     }
 
     document.addEventListener('DOMContentLoaded', function() {
       applyLanguage(getCurrentLang());
       checkHealth();
-      document.querySelectorAll('.lang-selector button').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var lang = this.getAttribute('data-lang');
-          if (lang) setCurrentLang(lang);
+      var langSel = document.getElementById('langSelector');
+      langSel.querySelector('.lang-toggle').addEventListener('click', function() {
+        langSel.classList.toggle('open');
+      });
+      langSel.querySelectorAll('li[data-lang]').forEach(function(li) {
+        li.addEventListener('click', function() {
+          setCurrentLang(this.getAttribute('data-lang'));
+          langSel.classList.remove('open');
         });
+      });
+      document.addEventListener('click', function(e) {
+        if (!langSel.contains(e.target)) langSel.classList.remove('open');
       });
       document.querySelectorAll('.tab').forEach(function(t) {
         t.addEventListener('click', function() {

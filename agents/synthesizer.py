@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -78,6 +79,16 @@ def _strip_fences(text: str) -> str:
         if s and s[0] not in ("{", "["):
             s = s.split("\n", 1)[-1].strip()
         return s
+    return s
+
+
+def _repair_json(raw: str) -> str:
+    """Attempt to fix common LLM JSON errors before parsing."""
+    s = raw
+    # Trailing commas before } or ]
+    s = re.sub(r",\s*([}\]])", r"\1", s)
+    # Missing comma between "value"\n"key" patterns
+    s = re.sub(r'(?<=["\d\]}])\s*\n(\s*")', r',\n\1', s)
     return s
 
 
@@ -212,26 +223,31 @@ def _call_claude(payload: Dict[str, Any]) -> Dict[str, Any]:
     client = _get_client()
     message = client.messages.create(
         model=_MODEL,
-        max_tokens=6144,
+        max_tokens=8192,
         system=_SYSTEM_PROMPT,
         messages=[{"role": "user", "content": json.dumps(payload)}],
     )
     raw = _strip_fences(_extract_text(message))
-    data = json.loads(raw)
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        log.info("Initial JSON parse failed — attempting repair.")
+        data = json.loads(_repair_json(raw))
     if isinstance(data, dict):
         data.setdefault("generated_at", _now())
         data.setdefault("se_name", _se_name())
     return data
 
 
-_EMPTY_LIST_FIELDS: Dict[str, list] = {
+_FALLBACK_DEFAULTS: Dict[str, Any] = {
+    "call_objectives": [],
+    "objections": [],
+    "open_action_items": [],
+    "demo_flow": [],
     "discovery_questions": [],
     "technical_win_map": [],
     "key_stakeholders": [],
     "risk_factors": [],
-}
-
-_EMPTY_STRING_FIELDS: Dict[str, str] = {
     "follow_up_email": "",
 }
 
@@ -289,17 +305,10 @@ def _customer_brief(
         brief["expansion_opportunity"] = {"surface": _NA, "risk": _NA, "product": _NA}
         brief["qbr_headline_stats"] = []
 
-    brief.update({
-        "call_objectives": [],
-        "objections": [],
-        "open_action_items": [],
-        "demo_flow": [],
-        "renewal_defense": _NA,
-        "competitive_angle": "",
-        "industry_proof_point": "",
-        **_EMPTY_LIST_FIELDS,
-        **_EMPTY_STRING_FIELDS,
-    })
+    brief.update(_FALLBACK_DEFAULTS)
+    brief["renewal_defense"] = _NA
+    brief["competitive_angle"] = ""
+    brief["industry_proof_point"] = ""
     return brief
 
 
@@ -329,14 +338,7 @@ def _prospect_brief(
     brief["conversation_hook"] = ni.get("conversation_hook") or _NA
     brief["competitive_angle"] = _NA
     brief["industry_proof_point"] = _NA if not taegis else "See Taegis benchmarks."
-    brief.update({
-        "call_objectives": [],
-        "objections": [],
-        "open_action_items": [],
-        "demo_flow": [],
-        **_EMPTY_LIST_FIELDS,
-        **_EMPTY_STRING_FIELDS,
-    })
+    brief.update(_FALLBACK_DEFAULTS)
     return brief
 
 
@@ -420,13 +422,18 @@ def _build_instruction(
         "Use the se_notes, business_challenges, edr_landscape, company_profile, and "
         "technical_win_criteria fields in opp to make every section specific — avoid generic advice."
     ]
-    if language == "ja":
-        parts.append(
-            "Write all string values in this JSON in Japanese (e.g. deal_snapshot, roi_hook, "
-            "objections, demo_flow talking_points, conversation_hook, follow_up_email, etc.)."
-        )
-    else:
-        parts.append("Write all string values in this JSON in English.")
+    _LANG_FULL = "Write ALL string values in this JSON FULLY in {lang}. " \
+        "Translate every word — descriptions, talking points, rebuttals, hooks, email drafts, " \
+        "risk explanations, discovery questions, action items, etc. " \
+        "Only keep proper product names (e.g. Taegis, CrowdStrike, SentinelOne) in English. " \
+        "Do NOT leave generic English words or phrases untranslated."
+    lang_instructions = {
+        "ja": _LANG_FULL.format(lang="Japanese (日本語)"),
+        "zh": _LANG_FULL.format(lang="Mandarin Chinese (简体中文)"),
+        "th": _LANG_FULL.format(lang="Thai (ภาษาไทย)"),
+        "vi": _LANG_FULL.format(lang="Vietnamese (Tiếng Việt)"),
+    }
+    parts.append(lang_instructions.get(language, "Write all string values in this JSON in English."))
 
     if edr_landscape:
         tools = ", ".join(sorted({e.get("edr", "") for e in edr_landscape if e.get("edr")}))
@@ -466,9 +473,9 @@ def generate_brief(
     """
     Produce a battle-card brief.  Uses Claude when ANTHROPIC_API_KEY is
     available; falls back to a deterministic minimal brief otherwise.
-    language: "en" or "ja" — all narrative string fields in the brief are in that language.
+    language: "en", "ja", "zh", "th", or "vi" — all narrative string fields in the brief are in that language.
     """
-    if language not in ("en", "ja"):
+    if language not in ("en", "ja", "zh", "th", "vi"):
         language = "en"
 
     if not os.getenv("ANTHROPIC_API_KEY"):

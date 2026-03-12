@@ -16,7 +16,7 @@ pip3 install -r requirements.txt
 bash run.sh                    # opens http://localhost:5001
 ```
 
-Enter an opportunity name (e.g. `Smiths Cogwheels`) and click **Generate brief**, or use the **Manual input** tab for deals not yet in Vivun.
+Enter an opportunity name (e.g. `Smiths Cogwheels`) and click **Generate brief**, or use the **Manual input** tab for deals not yet in Vivun. When Vivun lacks Taegis data, use the optional **Taegis overrides** (Tenant ID + Region) in either tab to fetch customer telemetry.
 
 > **Demo mode:** With only `ANTHROPIC_API_KEY` set and all other keys blank, the app uses the bundled sample opportunity and still generates a full brief via Claude.
 
@@ -43,7 +43,7 @@ Serper (OSINT)        ─┘
 ### Pipeline
 
 1. **Vivun** — Pulls opportunity data: company profile, deal stage, competitor, SE notes, EDR landscape, technical win criteria. Falls back to `data/sample_opportunities.json` when `VIVUN_API_KEY` is not set.
-2. **Taegis** — Fetches CTU threat intelligence publications for prospects (CTPX or standard API); customer telemetry and coverage gaps for existing customers.
+2. **Taegis** — Fetches CTU threat intelligence publications for prospects (CTPX or standard API); customer telemetry and coverage gaps for existing customers. Supports region-specific routing (US1–US3, EU1–EU2) when a Taegis region is provided.
 3. **OSINT** *(prospects only)* — Searches job postings and cybersecurity news via Serper to infer security tools, hiring signals, and conversation hooks.
 4. **Claude** — Synthesizes everything into a battle card using a comprehensive SE knowledge base prompt.
 5. **Browser** — Renders the brief with one-click PDF export (print dialog → "Save as PDF").
@@ -73,7 +73,17 @@ The UI shows a **No access** banner listing skipped sources.
 
 ### Language support
 
-The app supports **English** and **Japanese** for both the UI and AI-generated brief content. Use the **EN / JA** toggle in the header.
+The app supports **5 languages** for both the UI and AI-generated brief content:
+
+| Code | Language |
+|------|----------|
+| en | English |
+| ja | Japanese (日本語) |
+| zh | Mandarin Chinese (中文) |
+| th | Thai (ไทย) |
+| vi | Vietnamese (Tiếng Việt) |
+
+Use the **language dropdown** (with flags) in the header to select the output language.
 
 ---
 
@@ -144,11 +154,11 @@ DealWisperer/
 ├── data/
 │   └── sample_opportunities.json # Demo opportunity (Smiths Cogwheels)
 ├── docs/
-│   └── API_GUIDE.md              # API integration reference
+│   ├── API_GUIDE.md              # API integration reference
+│   └── SETUP.md                  # Detailed setup guide
 ├── .env.example                  # Environment variable template
 ├── requirements.txt              # Python dependencies
-├── run.sh                        # macOS launcher script
-└── SETUP.md                      # Detailed setup guide
+└── run.sh                        # macOS launcher script
 ```
 
 ---

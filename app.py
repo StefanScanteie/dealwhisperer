@@ -40,12 +40,26 @@ def _api_status() -> dict:
     }
 
 
-_SUPPORTED_LANGS = ("en", "ja")
+_SUPPORTED_LANGS = ("en", "ja", "zh", "th", "vi")
 
 
 def _parse_language(body: dict) -> str:
     lang = (body.get("language") or "en").strip().lower()
     return lang if lang in _SUPPORTED_LANGS else "en"
+
+
+def _fetch_taegis(opp: dict, is_customer: bool):
+    """Fetch Taegis data — customer telemetry (with industry fallback) or industry intel."""
+    region = opp.get("taegis_region")
+    industry = opp.get("industry") or "General"
+    if is_customer:
+        tenant_id = opp.get("taegis_tenant_id") or "unknown"
+        data = get_customer_telemetry(tenant_id, region=region)
+        if data is None:
+            log.info("Customer telemetry unavailable — falling back to industry intel.")
+            data = get_industry_intel(industry, region=region)
+        return data
+    return get_industry_intel(industry, region=region)
 
 
 def _no_access_list(
@@ -104,18 +118,10 @@ def generate():
              opp.get("stage", ""), opp.get("competitor", ""))
 
     # 2 — Taegis
-    region = opp.get("taegis_region")
-    if is_customer and not region:
+    if is_customer and not opp.get("taegis_region"):
         log.warning("Customer tenant %s has no taegis_region — using default. "
                     "Set region in opportunity data for accuracy.", opp.get("taegis_tenant_id"))
-    if is_customer:
-        tenant_id = opp.get("taegis_tenant_id") or "unknown"
-        taegis_data = get_customer_telemetry(tenant_id, region=region)
-        if taegis_data is None:
-            log.info("Customer telemetry unavailable — falling back to industry intel.")
-            taegis_data = get_industry_intel(opp.get("industry") or "Healthcare", region=region)
-    else:
-        taegis_data = get_industry_intel(opp.get("industry") or "Healthcare", region=region)
+    taegis_data = _fetch_taegis(opp, is_customer)
 
     # 3 — OSINT (prospect only)
     company_name = opp.get("company_name") or opp.get("name") or opp_name
@@ -169,14 +175,11 @@ def quick_brief():
     }
 
     is_customer = is_existing_customer(opp)
-    region = opp.get("taegis_region")
     taegis_data = None
     if is_customer:
         log.info("Manual input with tenant %s (region %s) — fetching telemetry.",
-                 opp["taegis_tenant_id"], region or "default")
-        taegis_data = get_customer_telemetry(opp["taegis_tenant_id"], region=region)
-        if taegis_data is None:
-            taegis_data = get_industry_intel(opp.get("industry") or "General", region=region)
+                 opp["taegis_tenant_id"], opp.get("taegis_region") or "default")
+        taegis_data = _fetch_taegis(opp, is_customer)
 
     language = _parse_language(body)
     brief = generate_brief(opp, taegis_data, None, is_customer=is_customer, language=language)
